@@ -1,32 +1,12 @@
-/*use async_trait::async_trait;
+use async_trait::async_trait;
 use anyhow::Result;
 
-#[cfg(test)]
-use mockall::automock;
-*/
-fn main() {
-    println!("Hello, world!");
-}
-
-/*
-#[cfg_attr(test, automock)]
-#[async_trait]
-pub trait BankRepository {
-    // 新規口座作成
-    async fn create_new_account(&self, user_id: &String) -> Result<()>;
-    // 残高表示
-    async fn find_account(&self, user_id: &String) -> Result<BankAccount>;
-    // 履歴
-    async fn histories(&self, user_id: &String) -> Result<Option<AccountHistories>>;
-    // 入金
-    async fn payment(&self, user_id: &String, money: i32) -> Result<()>;
-    // 引き落とし
-    async fn debit(&self, user_id: &String, money: i32) -> Result<()>;
-}
+use crate::domain::{
+    model::bank::{BankAccount, AccountHistories},
+    repository::bank::BankRepository,
+};
 
 pub struct Bank;
-pub struct BankAccount;
-pub struct AccountHistories;
 
 #[async_trait]
 impl BankRepository for Bank {
@@ -60,7 +40,10 @@ impl BankRepository for Bank {
 mod bank_test {
     use mockall::predicate::*;
 
-    use super::*;
+    use crate::domain::{
+        model::bank::{BankAccount, AccountHistories},
+        repository::bank::{BankRepository, MockBankRepository},
+    };
 
     #[tokio::test]
     async fn new_accounts_can_be_created() {
@@ -144,4 +127,3 @@ mod bank_test {
         assert!(result.is_ok());
     }
 }
-*/
