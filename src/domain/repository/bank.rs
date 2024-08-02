@@ -5,7 +5,7 @@ use crate::domain::model::bank::{BankAccount, AccountHistories};
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
-pub trait BankRepository {
+pub trait BankManagerRepository {
     async fn create_new_account(&self, user_id: &String) -> Result<()>;
     async fn find_account(&self, user_id: &String) -> Result<BankAccount>;
     async fn histories(&self, user_id: &String) -> Result<Option<AccountHistories>>;

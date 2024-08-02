@@ -3,13 +3,13 @@ use anyhow::Result;
 
 use crate::domain::{
     model::bank::{BankAccount, AccountHistories},
-    repository::bank::BankRepository,
+    repository::bank::BankManagerRepository,
 };
 
-pub struct Bank;
+pub struct BankManager;
 
 #[async_trait]
-impl BankRepository for Bank {
+impl BankManagerRepository for BankManager {
     async fn create_new_account(&self, user_id: &String) -> Result<()> {
         println!("user: {}", user_id);
         Ok(())
@@ -42,12 +42,12 @@ mod bank_test {
 
     use crate::domain::{
         model::bank::{BankAccount, AccountHistories},
-        repository::bank::{BankRepository, MockBankRepository},
+        repository::bank::{BankManagerRepository, MockBankManagerRepository},
     };
 
     #[tokio::test]
     async fn new_accounts_can_be_created() {
-        let mut sut = MockBankRepository::new();
+        let mut sut = MockBankManagerRepository::new();
 
         let user_id = "user123".to_string();
 
@@ -63,7 +63,7 @@ mod bank_test {
 
     #[tokio::test]
     async fn account_can_be_found() {
-        let mut sut = MockBankRepository::new();
+        let mut sut = MockBankManagerRepository::new();
 
         let user_id = "user123".to_string();
 
@@ -79,7 +79,7 @@ mod bank_test {
 
     #[tokio::test]
     async fn histories_can_be_found() {
-        let mut sut = MockBankRepository::new();
+        let mut sut = MockBankManagerRepository::new();
 
         let user_id = "user123".to_string();
 
@@ -95,7 +95,7 @@ mod bank_test {
 
     #[tokio::test]
     async fn payment_can_be_made() {
-        let mut sut = MockBankRepository::new();
+        let mut sut = MockBankManagerRepository::new();
 
         let user_id = "user123".to_string();
         let money: i32 = 10;
@@ -112,7 +112,7 @@ mod bank_test {
 
     #[tokio::test]
     async fn debit_can_be_made() {
-        let mut sut = MockBankRepository::new();
+        let mut sut = MockBankManagerRepository::new();
 
         let user_id = "user123".to_string();
         let money: i32 = 10;
