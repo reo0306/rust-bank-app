@@ -10,27 +10,27 @@ pub struct BankManager;
 
 #[async_trait]
 impl BankManagerRepository for BankManager {
-    async fn create_new_account(&self, user_id: &String) -> Result<()> {
-        println!("user: {}", user_id);
-        Ok(())
-    }
-
-    async fn find_account(&self, user_id: &String) -> Result<BankAccount> {
-        println!("user: {}", user_id);
+    async fn find_account(&self, id: &Id<BankAccount>) -> Result<Option<BankAccount>> {
+        println!("user: {}", id);
         Ok(BankAccount)
     }
 
-    async fn histories(&self, user_id: &String) -> Result<Option<AccountHistories>> {
-        println!("user: {}", user_id);
+    async fn find_histories(&self, id: &Id<DepositHistories>) -> Result<Option<AccountHistories>> {
+        println!("user: {}", id);
         Ok(Some(AccountHistories))
     }
 
-    async fn payment(&self, user_id: &String, money: i32) -> Result<()> {
-        println!("user: {}, money: {}", user_id, money);
+    async fn create_new_account(&self, id: &Id<BankAccount>, params: NewBankAccount) -> Result<()> {
+        println!("user: {}", id);
         Ok(())
     }
 
-    async fn debit(&self, user_id: &String, money: i32) -> Result<()> {
+    async fn create_new_history(&self, id: &Id<DepositHistories>, params: NewDepositHistory) -> Result<()> {
+        println!("user: {}", id);
+        Ok(())
+    }
+
+    async fn update_money(&self, id: &Id<BankAccount>, params: RenewMoney) -> Result<()> {
         println!("user: {}, money: {}", user_id, money);
         Ok(())
     }

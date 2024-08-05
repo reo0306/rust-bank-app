@@ -19,9 +19,9 @@ pub async fn run(modules: Arc<Modules>) -> Result<()> {
     let bank_router = Router::new()
         .route("/", post(create_account))
         .route("/:id", get(find_account))
-        .route("/history/:id", get(find_histories))
-        .route("/history/:id/:money", post(create_history))
-        .route("/money/:id/:money", patch(update_money));
+        .route("/history/:id", get(find_histories), post(create_history))
+        //.route("/history/:id", post(create_history))
+        .route("/money/:id", patch(update_money));
 
     let app = Router::new()
         .nest("/bank", bank_router)

@@ -8,7 +8,6 @@ use axum::{
 use std::sync::Arc;
 
 use crate::driver::{
-    context::validate::ValidatedRequest,
     model::bank::{
         JsonAccountView,
         JsonHistoriesView,
@@ -61,7 +60,7 @@ pub async fn find_histories(
 
 pub async fn create_account(
     Extension(modules): Extension<Arc<Modules>>,
-    ValidatedRequest(params ): ValidatedRequest<JsonCreateAccount>,
+    Json(params): Json<JsonCreateAccount>,
     ) -> Result<impl IntoResponse, StatusCode> {
         modules
             .bank_manager_use_case()
@@ -76,7 +75,8 @@ pub async fn create_account(
 
 pub async fn create_history(
     Extension(modules): Extension<Arc<Modules>>,
-    ValidatedRequest(params ): ValidatedRequest<JsonCreateHistory>,
+    Path(id): Path<String>,
+    Json(params): Json<JsonCreateHistory>,
     ) -> Result<impl IntoResponse, StatusCode> {
         modules
             .bank_manager_use_case()

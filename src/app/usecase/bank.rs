@@ -7,7 +7,7 @@ use crate::domain::{
     repository::bank::BankManagerRepository
 };
 use crate::adapter::module::RepositoriesModuleExt;
-use crate::app::model::bank::{CreateBaby, UpdateBaby};
+use crate::app::model::bank::{BankAccount, DepositHistories, UpdateMoney};
 
 #[derive(new)]
 pub struct BankManagerUseCase<R: RepositoriesModuleExt> {
@@ -15,27 +15,40 @@ pub struct BankManagerUseCase<R: RepositoriesModuleExt> {
 }
 
 impl <R: RepositoriesModuleExt> BankManagerUseCase<R> {
-    pub async fn find_baby(&self, id: String) -> Result<Option<Baby>> {
+    pub async fn view_account(&self, id: String) -> Result<Option<BankAccount>> {
         self.repositories
-            .baby_repository()
-            .find(&id.try_into()?)
+            .bank_manager_repository()
+            .find_account(&id.try_into()?)
             .await
-            .map(|baby| baby.map(|b| b.into()))
+            .map(|account| account.map(|a| a.into()))
     }
 
-    pub async fn create_baby(&self, data: CreateBaby) -> Result<()> {
-        self.repositories.baby_repository().register(data.try_into()?).await
-    }
-
-    pub async fn update_baby(&self, id: String, data: UpdateBaby) -> Result<()> {
+    pub async fn add_account(&self, id: String, data: CreateAccount) -> Result<()> {
         self.repositories
-            .baby_repository()
-            .update(&id.try_into()?, data.try_into()?)
+            .bank_manager_repository()
+            .create_new_account(&id.try_into()?, data.try_into()?).await
+    }
+
+    pub async fn view_histories(&self, id: String) -> Result<Option<DepositHistories>> {
+        self.repositories
+            .bank_manager_repository()
+            .find_histories(&id.try_into()?)
+            .await
+            .map(|histories| histories.map(|h| h.into()))
+    }
+
+    pub async fn add_history(&self, id: String, data: CreateHistory) -> Result<()> {
+        self.repositories
+            .bank_manager_repository()
+            .create_new_history(&id.try_into()?, data.try_into()?)
             .await
     }
 
-    pub async fn delete_baby(&self, id: String) -> Result<()> {
-        self.repositories.baby_repository().delete(&id.try_into()?).await
+    pub async fn manage_money(&self, id: String, data: UpdateMoney) -> Result<()> {
+        self.repositories
+            .bank_manager_repository()
+            .update_money(&id.try_into()?, data.try_into()?)
+            .await
     }
 }
 
