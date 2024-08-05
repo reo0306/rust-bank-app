@@ -10,7 +10,7 @@ use bank_app::driver::{
 async fn main() -> Result<()> {
     let modules = Modules::new().await;
 
-    startup::run(Arc::new(modules)).await.expect("run child care error");
+    startup::run(Arc::new(modules)).await.expect("run bank error");
 
     Ok(())
 }
