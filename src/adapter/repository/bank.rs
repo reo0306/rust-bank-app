@@ -1,37 +1,41 @@
 use async_trait::async_trait;
 use anyhow::Result;
 
+use super::DatabaseRepositoryImpl;
 use crate::domain::{
-    model::bank::{BankAccount, AccountHistories},
+    model::{
+        Id,
+        bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, RenewMoney}
+    },
     repository::bank::BankManagerRepository,
 };
 
-pub struct BankManager;
-
 #[async_trait]
-impl BankManagerRepository for BankManager {
+impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
     async fn find_account(&self, id: &Id<BankAccount>) -> Result<Option<BankAccount>> {
-        println!("user: {}", id);
-        Ok(BankAccount)
+        //println!("user: {:?}", id);
+        let r = BankAccount::new("a".to_string(), "b".to_string(), "c".to_string(), 1);
+        Ok(Some(r))
     }
 
-    async fn find_histories(&self, id: &Id<DepositHistories>) -> Result<Option<AccountHistories>> {
-        println!("user: {}", id);
-        Ok(Some(AccountHistories))
+    async fn find_histories(&self, id: &Id<DepositHistories>) -> Result<Option<DepositHistories>> {
+        //println!("user: {:?}", id);
+        let r = DepositHistories::new("a".to_string(), "b".to_string(), 1);
+        Ok(Some(r))
     }
 
     async fn create_new_account(&self, id: &Id<BankAccount>, params: NewBankAccount) -> Result<()> {
-        println!("user: {}", id);
+        //println!("user: {:?}", id);
         Ok(())
     }
 
     async fn create_new_history(&self, id: &Id<DepositHistories>, params: NewDepositHistory) -> Result<()> {
-        println!("user: {}", id);
+        //println!("user: {:?}", id);
         Ok(())
     }
 
     async fn update_money(&self, id: &Id<BankAccount>, params: RenewMoney) -> Result<()> {
-        println!("user: {}, money: {}", user_id, money);
+        //println!("user: {:?}", id);
         Ok(())
     }
 }

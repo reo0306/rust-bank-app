@@ -14,7 +14,7 @@ pub struct CreateBankAccount {
 }
 
 #[derive(new)]
-pub struct CreateDepositoHistory {
+pub struct CreateDepositHistory {
     pub bank_account_id: String,
     pub action: String,
     pub money: i32,
@@ -44,10 +44,10 @@ impl TryFrom<CreateBankAccount> for NewBankAccount {
     }
 }
 
-impl TryFrom<CreateDepositoHistory> for NewDepositHistory {
+impl TryFrom<CreateDepositHistory> for NewDepositHistory {
     type Error = anyhow::Error;
 
-    fn try_from(cdh: CreateDepositoHistory) -> anyhow::Result<Self, Self::Error> {
+    fn try_from(cdh: CreateDepositHistory) -> anyhow::Result<Self, Self::Error> {
         let new_deposit_history_id = Id::gen();
 
         Ok(

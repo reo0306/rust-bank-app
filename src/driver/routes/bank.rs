@@ -31,8 +31,8 @@ pub async fn find_account(
                 (StatusCode::OK, Json(json))
             })
             .ok_or_else(|| StatusCode::NOT_FOUND),
-            Err(err) => {
-                error!("Find account error: {:?}", err);
+            Err(_) => {
+                //error!("Find account error: {:?}", err);
                 Err(StatusCode::INTERNAL_SERVER_ERROR)
             }
         }
@@ -51,8 +51,8 @@ pub async fn find_histories(
                 (StatusCode::OK, Json(json))
             })
             .ok_or_else(|| StatusCode::NOT_FOUND),
-            Err(err) => {
-                error!("Find history error: {:?}", err);
+            Err(_) => {
+                //error!("Find history error: {:?}", err);
                 Err(StatusCode::INTERNAL_SERVER_ERROR)
             }
         }
@@ -60,15 +60,16 @@ pub async fn find_histories(
 
 pub async fn create_account(
     Extension(modules): Extension<Arc<Modules>>,
+    Path(id): Path<String>,
     Json(params): Json<JsonCreateAccount>,
     ) -> Result<impl IntoResponse, StatusCode> {
         modules
             .bank_manager_use_case()
-            .add_account(params.into())
+            .add_account(id, params.into())
             .await
             .map(|_| StatusCode::NO_CONTENT)
-            .map_err(|err| {
-                error!("Create account error: {}", err);
+            .map_err(|_| {
+                //error!("Create account error: {}", err);
                 StatusCode::INTERNAL_SERVER_ERROR
             })
 }
@@ -80,11 +81,11 @@ pub async fn create_history(
     ) -> Result<impl IntoResponse, StatusCode> {
         modules
             .bank_manager_use_case()
-            .add_history(params.into())
+            .add_history(id, params.into())
             .await
             .map(|_| StatusCode::NO_CONTENT)
-            .map_err(|err| {
-                error!("Create history error: {}", err);
+            .map_err(|_| {
+                //error!("Create history error: {}", err);
                 StatusCode::INTERNAL_SERVER_ERROR
             })
 }
@@ -99,8 +100,8 @@ pub async fn update_money(
             .manage_money(id, params.into())
             .await
             .map(|_| StatusCode::NO_CONTENT)
-            .map_err(|err| {
-                error!("Update money error: {}", err);
+            .map_err(|_| {
+                //error!("Update money error: {}", err);
                 StatusCode::INTERNAL_SERVER_ERROR
             })
 }

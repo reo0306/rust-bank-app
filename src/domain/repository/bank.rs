@@ -1,10 +1,9 @@
 use async_trait::async_trait;
 use anyhow::Result;
 
-use crate::domain::model::bank::{
+use crate::domain::model::{
     Id,
-    BankAccount, DepositHistories
-    NewBankAccount, NewDepositHistory, RenewMoney
+    bank::{BankAccount, DepositHistories,NewBankAccount, NewDepositHistory, RenewMoney},
 };
 
 #[cfg_attr(test, mockall::automock)]
@@ -14,5 +13,5 @@ pub trait BankManagerRepository {
     async fn find_histories(&self, id: &Id<DepositHistories>) -> Result<Option<DepositHistories>>;
     async fn create_new_account(&self, id: &Id<BankAccount>, params: NewBankAccount) -> Result<()>;
     async fn create_new_history(&self, id: &Id<DepositHistories>, params: NewDepositHistory) -> Result<()>;
-    async fn update_money(&self, id: &Id<BankAccount>, params: RenewBaby) -> Result<()>;
+    async fn update_money(&self, id: &Id<BankAccount>, params: RenewMoney) -> Result<()>;
 }

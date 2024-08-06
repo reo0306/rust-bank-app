@@ -34,7 +34,6 @@ pub struct NewDepositHistory {
     pub money: i32,
 }
 
-
 #[derive(new)]
 pub struct RenewMoney {
     pub id: String,

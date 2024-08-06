@@ -19,7 +19,7 @@ pub async fn run(modules: Arc<Modules>) -> Result<()> {
     let bank_router = Router::new()
         .route("/", post(create_account))
         .route("/:id", get(find_account))
-        .route("/history/:id", get(find_histories), post(create_history))
+        .route("/history/:id", get(find_histories).post(create_history))
         //.route("/history/:id", post(create_history))
         .route("/money/:id", patch(update_money));
 

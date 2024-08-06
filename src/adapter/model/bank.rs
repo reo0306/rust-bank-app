@@ -1,6 +1,6 @@
 use sqlx::FromRow;
 
-use crate::domain::model::bank::{BankAccount, DepositHistories};
+use crate::domain::model::bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, RenewMoney};
 
 #[derive(FromRow)]
 pub struct BankAccountTable {
@@ -91,7 +91,7 @@ impl TryFrom<NewDepositHistory> for NewDepositHistoryRecord {
                 id: ndh.id.value.to_string(),
                 bank_account_id: ndh.bank_account_id,
                 action: ndh.action,
-                money: nba.money,
+                money: ndh.money,
             }
         )
     }

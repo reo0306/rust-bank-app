@@ -3,11 +3,11 @@ use std::sync::Arc;
 use anyhow::Result;
 
 use crate::domain::{
-    model::bank::Bank,
+    model::bank::{BankAccount, DepositHistories},
     repository::bank::BankManagerRepository
 };
 use crate::adapter::module::RepositoriesModuleExt;
-use crate::app::model::bank::{BankAccount, DepositHistories, UpdateMoney};
+use crate::app::model::bank::{CreateBankAccount, CreateDepositHistory, UpdateMoney};
 
 #[derive(new)]
 pub struct BankManagerUseCase<R: RepositoriesModuleExt> {
@@ -23,7 +23,7 @@ impl <R: RepositoriesModuleExt> BankManagerUseCase<R> {
             .map(|account| account.map(|a| a.into()))
     }
 
-    pub async fn add_account(&self, id: String, data: CreateAccount) -> Result<()> {
+    pub async fn add_account(&self, id: String, data: CreateBankAccount) -> Result<()> {
         self.repositories
             .bank_manager_repository()
             .create_new_account(&id.try_into()?, data.try_into()?).await
@@ -37,7 +37,7 @@ impl <R: RepositoriesModuleExt> BankManagerUseCase<R> {
             .map(|histories| histories.map(|h| h.into()))
     }
 
-    pub async fn add_history(&self, id: String, data: CreateHistory) -> Result<()> {
+    pub async fn add_history(&self, id: String, data: CreateDepositHistory) -> Result<()> {
         self.repositories
             .bank_manager_repository()
             .create_new_history(&id.try_into()?, data.try_into()?)

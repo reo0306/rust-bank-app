@@ -1,8 +1,9 @@
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 
-use crate::app::model::{
-    CreateAccount,
-    CreateHistory,
+use crate::domain::model::bank::{BankAccount, DepositHistories};
+use crate::app::model::bank::{
+    CreateBankAccount,
+    CreateDepositHistory,
     UpdateMoney,
 };
 
@@ -41,9 +42,9 @@ pub struct JsonUpdateMoney {
     pub money: i32,
 }
 
-impl From<JsonCreateAccount> for CreateAccount {
+impl From<JsonCreateAccount> for CreateBankAccount {
     fn from(jca: JsonCreateAccount) -> Self {
-        CreateAccount {
+        CreateBankAccount {
             bank_id: jca.bank_id,
             branch_office_id: jca.branch_office_id,
             name: jca.name,
@@ -52,21 +53,21 @@ impl From<JsonCreateAccount> for CreateAccount {
     }
 }
 
-impl From<JsonCreateHistory> for CreateHistory {
+impl From<JsonCreateHistory> for CreateDepositHistory {
     fn from(jch: JsonCreateHistory) -> Self {
-        CreateHistory {
+        CreateDepositHistory {
             bank_account_id: jch.bank_account_id,
-            action: jca.action,
-            money: jca.money,
+            action: jch.action,
+            money: jch.money,
         }
     }
 }
 
 impl From<JsonUpdateMoney> for UpdateMoney {
     fn from(jum: JsonUpdateMoney) -> Self {
-        UpdateBaby {
+        UpdateMoney {
             id: jum.id,
-            monet: jum.money,
+            money: jum.money,
         } 
     }
 }
@@ -74,17 +75,17 @@ impl From<JsonUpdateMoney> for UpdateMoney {
 impl From<BankAccount> for JsonAccountView {
     fn from(ba: BankAccount) -> Self {
         JsonAccountView {
-            bank_id: ba.id.value.to_string(),
-            branch_office_id: ba.id.value.to_string(),
+            bank_id: ba.bank_id.to_string(),
+            branch_office_id: ba.branch_office_id.to_string(),
             name: ba.name,
             money: ba.money,
         }
     }
 }
 
-impl From<DepositHistories> for JsonHistoryView {
+impl From<DepositHistories> for JsonHistoriesView {
     fn from(dh: DepositHistories) -> Self {
-        JsonHistoryView {
+        JsonHistoriesView {
             action: dh.action,
             money: dh.money,
         }

@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 use derive_new::new;
 
-use super::database::mysql::Db;
+use super::persistence::mysql::Db;
 
 pub mod bank;
 
