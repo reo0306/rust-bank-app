@@ -66,7 +66,6 @@ impl From<JsonCreateHistory> for CreateDepositHistory {
 impl From<JsonUpdateMoney> for UpdateMoney {
     fn from(jum: JsonUpdateMoney) -> Self {
         UpdateMoney {
-            id: jum.id,
             money: jum.money,
         } 
     }

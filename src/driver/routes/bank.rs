@@ -60,12 +60,11 @@ pub async fn find_histories(
 
 pub async fn create_account(
     Extension(modules): Extension<Arc<Modules>>,
-    Path(id): Path<String>,
     Json(params): Json<JsonCreateAccount>,
     ) -> Result<impl IntoResponse, StatusCode> {
         modules
             .bank_manager_use_case()
-            .add_account(id, params.into())
+            .add_account(params.into())
             .await
             .map(|_| StatusCode::NO_CONTENT)
             .map_err(|_| {
@@ -76,12 +75,11 @@ pub async fn create_account(
 
 pub async fn create_history(
     Extension(modules): Extension<Arc<Modules>>,
-    Path(id): Path<String>,
     Json(params): Json<JsonCreateHistory>,
     ) -> Result<impl IntoResponse, StatusCode> {
         modules
             .bank_manager_use_case()
-            .add_history(id, params.into())
+            .add_history(params.into())
             .await
             .map(|_| StatusCode::NO_CONTENT)
             .map_err(|_| {

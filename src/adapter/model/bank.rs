@@ -33,7 +33,6 @@ pub struct NewDepositHistoryRecord {
 }
 
 pub struct RenewMoneyRecord {
-    pub id: String,
     pub money: i32,
 }
 
@@ -103,7 +102,6 @@ impl TryFrom<RenewMoney> for RenewMoneyRecord {
     fn try_from(rm: RenewMoney) -> Result<Self, Self::Error> {
         Ok(
             RenewMoneyRecord {
-                id: rm.id,
                 money: rm.money,
             }
         )

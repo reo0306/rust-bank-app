@@ -23,10 +23,10 @@ impl <R: RepositoriesModuleExt> BankManagerUseCase<R> {
             .map(|account| account.map(|a| a.into()))
     }
 
-    pub async fn add_account(&self, id: String, data: CreateBankAccount) -> Result<()> {
+    pub async fn add_account(&self, data: CreateBankAccount) -> Result<()> {
         self.repositories
             .bank_manager_repository()
-            .create_new_account(&id.try_into()?, data.try_into()?).await
+            .create_new_account(data.try_into()?).await
     }
 
     pub async fn view_histories(&self, id: String) -> Result<Option<DepositHistories>> {
@@ -37,10 +37,10 @@ impl <R: RepositoriesModuleExt> BankManagerUseCase<R> {
             .map(|histories| histories.map(|h| h.into()))
     }
 
-    pub async fn add_history(&self, id: String, data: CreateDepositHistory) -> Result<()> {
+    pub async fn add_history(&self, data: CreateDepositHistory) -> Result<()> {
         self.repositories
             .bank_manager_repository()
-            .create_new_history(&id.try_into()?, data.try_into()?)
+            .create_new_history(data.try_into()?)
             .await
     }
 

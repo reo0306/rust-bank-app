@@ -9,33 +9,106 @@ use crate::domain::{
     },
     repository::bank::BankManagerRepository,
 };
+use crate::adapter::model::bank::{
+    BankAccountTable,
+    DepositHistoriesTable,
+    NewBankAccountRecord,
+    NewDepositHistoryRecord,
+    RenewMoneyRecord,
+};
 
 #[async_trait]
 impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
     async fn find_account(&self, id: &Id<BankAccount>) -> Result<Option<BankAccount>> {
-        //println!("user: {:?}", id);
-        let r = BankAccount::new("a".to_string(), "b".to_string(), "c".to_string(), 1);
-        Ok(Some(r))
+        let pool = self.pool.0.clone();
+
+        let bank_account_table = sqlx::query_as::<_, BankAccountTable>(
+            r#"
+            SELECT bank_id, branch_office_id, name, money FROM bank_accounts WHERE id = ?;
+            "#
+        )
+        .bind(id.value.to_string())
+        .fetch_one(&*pool)
+        .await
+        .ok();
+
+        bank_account_table
+            .map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
     }
 
     async fn find_histories(&self, id: &Id<DepositHistories>) -> Result<Option<DepositHistories>> {
-        //println!("user: {:?}", id);
-        let r = DepositHistories::new("a".to_string(), "b".to_string(), 1);
-        Ok(Some(r))
+        let pool = self.pool.0.clone();
+
+        let deposit_histories_table = sqlx::query_as::<_, DepositHistoriesTable>(
+            r#"
+            SELECT bank_account_id, action, money FROM deposit_histories WHERE id = ?;
+            "#
+        )
+        .bind(id.value.to_string())
+        .fetch_one(&*pool)
+        .await
+        .ok();
+
+        deposit_histories_table
+            .map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
     }
 
-    async fn create_new_account(&self, id: &Id<BankAccount>, params: NewBankAccount) -> Result<()> {
-        //println!("user: {:?}", id);
+    async fn create_new_account(&self, params: NewBankAccount) -> Result<()> {
+        let pool = self.pool.0.clone();
+
+        let new_bank_account_record: NewBankAccountRecord = params.try_into()?;
+
+        sqlx::query(
+            r#"
+            INSERT INTO bank_accounts (id, bank_id, branch_office_id, name, money) VALUES(?, ?, ?, ?, ?);
+            "#,
+        )
+        .bind(new_bank_account_record.id)
+        .bind(new_bank_account_record.bank_id)
+        .bind(new_bank_account_record.branch_office_id)
+        .bind(new_bank_account_record.name)
+        .bind(new_bank_account_record.money)
+        .execute(&*pool)
+        .await?;
+
         Ok(())
     }
 
-    async fn create_new_history(&self, id: &Id<DepositHistories>, params: NewDepositHistory) -> Result<()> {
-        //println!("user: {:?}", id);
+    async fn create_new_history(&self, params: NewDepositHistory) -> Result<()> {
+        let pool = self.pool.0.clone();
+
+        let new_deposit_history_record: NewDepositHistoryRecord = params.try_into()?;
+
+        sqlx::query(
+            r#"
+            INSERT INTO deposit_histories (id, bank_account_id, action, money) VALUES(?, ?, ?, ?);
+            "#,
+        )
+        .bind(new_deposit_history_record.id)
+        .bind(new_deposit_history_record.bank_account_id)
+        .bind(new_deposit_history_record.action)
+        .bind(new_deposit_history_record.money)
+        .execute(&*pool)
+        .await?;
+
         Ok(())
     }
 
     async fn update_money(&self, id: &Id<BankAccount>, params: RenewMoney) -> Result<()> {
-        //println!("user: {:?}", id);
+        let pool = self.pool.0.clone();
+
+        let renew_money_record: RenewMoneyRecord = params.try_into()?;
+
+        sqlx::query(
+            r#"
+            UPDATE bank_accounts SET money = ? WHERE id = ?;
+            "#,
+        )
+        .bind(renew_money_record.money)
+        .bind(id.value.to_string())
+        .execute(&*pool)
+        .await?;
+
         Ok(())
     }
 }

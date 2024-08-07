@@ -22,7 +22,6 @@ pub struct CreateDepositHistory {
 
 #[derive(new)]
 pub struct UpdateMoney {
-    pub id: String,
     pub money: i32,
 }
 
@@ -67,7 +66,6 @@ impl TryFrom<UpdateMoney> for RenewMoney {
     fn try_from(um: UpdateMoney) -> anyhow::Result<Self, Self::Error> {
         Ok(
             RenewMoney::new(
-                um.id,
                 um.money,
             )
         )
