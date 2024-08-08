@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use crate::adapter::{
-    persistence::mysql::Db,
     module::{RepositoriesModule, RepositoriesModuleExt},
+    persistence::mysql::Db,
 };
 use crate::app::usecase::bank::BankManagerUseCase;
 

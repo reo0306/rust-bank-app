@@ -1,20 +1,17 @@
-use async_trait::async_trait;
 use anyhow::Result;
+use async_trait::async_trait;
 
 use super::DatabaseRepositoryImpl;
+use crate::adapter::model::bank::{
+    BankAccountTable, DepositHistoriesTable, NewBankAccountRecord, NewDepositHistoryRecord,
+    RenewMoneyRecord,
+};
 use crate::domain::{
     model::{
+        bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, RenewMoney},
         Id,
-        bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, RenewMoney}
     },
     repository::bank::BankManagerRepository,
-};
-use crate::adapter::model::bank::{
-    BankAccountTable,
-    DepositHistoriesTable,
-    NewBankAccountRecord,
-    NewDepositHistoryRecord,
-    RenewMoneyRecord,
 };
 
 #[async_trait]
@@ -25,15 +22,14 @@ impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
         let bank_account_table = sqlx::query_as::<_, BankAccountTable>(
             r#"
             SELECT bank_id, branch_office_id, name, money FROM bank_accounts WHERE id = ?;
-            "#
+            "#,
         )
         .bind(id.value.to_string())
         .fetch_one(&*pool)
         .await
         .ok();
 
-        bank_account_table
-            .map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
+        bank_account_table.map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
     }
 
     async fn find_histories(&self, id: &Id<DepositHistories>) -> Result<Option<DepositHistories>> {
@@ -42,15 +38,14 @@ impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
         let deposit_histories_table = sqlx::query_as::<_, DepositHistoriesTable>(
             r#"
             SELECT bank_account_id, action, money FROM deposit_histories WHERE id = ?;
-            "#
+            "#,
         )
         .bind(id.value.to_string())
         .fetch_one(&*pool)
         .await
         .ok();
 
-        deposit_histories_table
-            .map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
+        deposit_histories_table.map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
     }
 
     async fn create_new_account(&self, params: NewBankAccount) -> Result<()> {
@@ -114,26 +109,36 @@ impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
 }
 
 #[cfg(test)]
-mod bank_test {
+mod bank_repository_unit_test {
     use mockall::predicate::*;
+    use ulid::Ulid;
 
     use crate::domain::{
-        model::bank::{BankAccount, AccountHistories},
+        model::{
+            bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, RenewMoney},
+            Id,
+        },
         repository::bank::{BankManagerRepository, MockBankManagerRepository},
     };
 
     #[tokio::test]
-    async fn new_accounts_can_be_created() {
+    async fn new_account_can_be_created() {
         let mut sut = MockBankManagerRepository::new();
 
-        let user_id = "user123".to_string();
+        let data = NewBankAccount {
+            id: Id::new(Ulid::new()),
+            bank_id: "1".to_string(),
+            branch_office_id: "2".to_string(),
+            name: "test".to_string(),
+            money: 0,
+        };
 
         sut.expect_create_new_account()
-            .with(eq(user_id.clone()))
+            .with(eq(data.clone()))
             .times(1)
             .returning(|_| Ok(()));
 
-        let result = sut.create_new_account(&user_id).await;
+        let result = sut.create_new_account(data).await;
 
         assert!(result.is_ok());
     }
@@ -142,64 +147,81 @@ mod bank_test {
     async fn account_can_be_found() {
         let mut sut = MockBankManagerRepository::new();
 
-        let user_id = "user123".to_string();
+        let id = Id::new(Ulid::new());
 
         sut.expect_find_account()
-            .with(eq(user_id.clone()))
+            .with(eq(id.clone()))
             .times(1)
-            .returning(|_| Ok(BankAccount));
+            .returning(|_| {
+                Ok(Some(BankAccount {
+                    bank_id: "a".to_string(),
+                    branch_office_id: "b".to_string(),
+                    name: "c".to_string(),
+                    money: 1,
+                }))
+            });
 
-        let result = sut.find_account(&user_id).await;
+        let result = sut.find_account(&id).await;
 
         assert!(result.is_ok());
     }
 
     #[tokio::test]
-    async fn histories_can_be_found() {
+    async fn new_deposit_history_can_be_created() {
         let mut sut = MockBankManagerRepository::new();
 
-        let user_id = "user123".to_string();
+        let data = NewDepositHistory {
+            id: Id::new(Ulid::new()),
+            bank_account_id: "1".to_string(),
+            action: "payment".to_string(),
+            money: 100,
+        };
 
-        sut.expect_histories()
-            .with(eq(user_id.clone()))
+        sut.expect_create_new_history()
+            .with(eq(data.clone()))
             .times(1)
-            .returning(|_| Ok(Some(AccountHistories)));
+            .returning(|_| Ok(()));
 
-        let result = sut.histories(&user_id).await;
+        let result = sut.create_new_history(data).await;
 
         assert!(result.is_ok());
     }
 
     #[tokio::test]
-    async fn payment_can_be_made() {
+    async fn deposit_histories_can_be_found() {
         let mut sut = MockBankManagerRepository::new();
 
-        let user_id = "user123".to_string();
-        let money: i32 = 10;
+        let id = Id::new(Ulid::new());
 
-        sut.expect_payment()
-            .with(eq(user_id.clone()), eq(money))
+        sut.expect_find_histories()
+            .with(eq(id.clone()))
+            .times(1)
+            .returning(|_| {
+                Ok(Some(DepositHistories {
+                    bank_account_id: "1".to_string(),
+                    action: "payment".to_string(),
+                    money: 100,
+                }))
+            });
+
+        let result = sut.find_histories(&id).await;
+
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn renew_money_can_be_made() {
+        let mut sut = MockBankManagerRepository::new();
+
+        let id = Id::new(Ulid::new());
+        let data = RenewMoney { money: 200 };
+
+        sut.expect_update_money()
+            .with(eq(id.clone()), eq(data.clone()))
             .times(1)
             .returning(|_, _| Ok(()));
 
-        let result = sut.payment(&user_id, money).await;
-
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
-    async fn debit_can_be_made() {
-        let mut sut = MockBankManagerRepository::new();
-
-        let user_id = "user123".to_string();
-        let money: i32 = 10;
-
-        sut.expect_debit()
-            .with(eq(user_id.clone()), eq(money))
-            .times(1)
-            .returning(|_, _| Ok(()));
-
-        let result = sut.debit(&user_id, money).await;
+        let result = sut.update_money(&id, data).await;
 
         assert!(result.is_ok());
     }

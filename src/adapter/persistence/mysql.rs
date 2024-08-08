@@ -19,9 +19,6 @@ impl Db {
 
         let pool = MySqlPool::connect(&db_url).await;
 
-        pool.map_or_else(
-            |_| panic!("not connect db"),
-            |pool| Self(Arc::new(pool))
-        )
+        pool.map_or_else(|_| panic!("not connect db"), |pool| Self(Arc::new(pool)))
     }
 }

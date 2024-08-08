@@ -1,8 +1,8 @@
 use derive_new::new;
 
 use crate::domain::model::{
+    bank::{NewBankAccount, NewDepositHistory, RenewMoney},
     Id,
-    bank::{NewBankAccount, NewDepositHistory, RenewMoney}
 };
 
 #[derive(new)]
@@ -31,15 +31,13 @@ impl TryFrom<CreateBankAccount> for NewBankAccount {
     fn try_from(cba: CreateBankAccount) -> anyhow::Result<Self, Self::Error> {
         let new_bank_account_id = Id::gen();
 
-        Ok(
-            NewBankAccount::new(
-                new_bank_account_id,
-                cba.bank_id,
-                cba.branch_office_id,
-                cba.name,
-                cba.money,
-            )
-        )
+        Ok(NewBankAccount::new(
+            new_bank_account_id,
+            cba.bank_id,
+            cba.branch_office_id,
+            cba.name,
+            cba.money,
+        ))
     }
 }
 
@@ -49,14 +47,12 @@ impl TryFrom<CreateDepositHistory> for NewDepositHistory {
     fn try_from(cdh: CreateDepositHistory) -> anyhow::Result<Self, Self::Error> {
         let new_deposit_history_id = Id::gen();
 
-        Ok(
-            NewDepositHistory::new(
-                new_deposit_history_id,
-                cdh.bank_account_id,
-                cdh.action,
-                cdh.money,
-            )
-        )
+        Ok(NewDepositHistory::new(
+            new_deposit_history_id,
+            cdh.bank_account_id,
+            cdh.action,
+            cdh.money,
+        ))
     }
 }
 
@@ -64,10 +60,6 @@ impl TryFrom<UpdateMoney> for RenewMoney {
     type Error = anyhow::Error;
 
     fn try_from(um: UpdateMoney) -> anyhow::Result<Self, Self::Error> {
-        Ok(
-            RenewMoney::new(
-                um.money,
-            )
-        )
+        Ok(RenewMoney::new(um.money))
     }
 }

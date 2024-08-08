@@ -1,9 +1,9 @@
-use async_trait::async_trait;
 use anyhow::Result;
+use async_trait::async_trait;
 
 use crate::domain::model::{
+    bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, RenewMoney},
     Id,
-    bank::{BankAccount, DepositHistories,NewBankAccount, NewDepositHistory, RenewMoney},
 };
 
 #[cfg_attr(test, mockall::automock)]

@@ -1,5 +1,5 @@
-use std::marker::PhantomData;
 use derive_new::new;
+use std::marker::PhantomData;
 use ulid::Ulid;
 
 pub mod bank;
@@ -7,7 +7,7 @@ pub mod bank;
 #[derive(new, Debug, Clone, PartialEq, Eq)]
 pub struct Id<T> {
     pub value: Ulid,
-    _marker: PhantomData<T>
+    _marker: PhantomData<T>,
 }
 
 impl<T> Id<T> {

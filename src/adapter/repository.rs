@@ -1,5 +1,5 @@
-use std::marker::PhantomData;
 use derive_new::new;
+use std::marker::PhantomData;
 
 use super::persistence::mysql::Db;
 

@@ -1,7 +1,4 @@
-use crate::domain::{
-    model::bank::BankAccount,
-    repository::bank::BankManagerRepository,
-};
+use crate::domain::{model::bank::BankAccount, repository::bank::BankManagerRepository};
 
 use super::repository::DatabaseRepositoryImpl;
 use crate::adapter::persistence::mysql::Db;
@@ -21,9 +18,9 @@ impl RepositoriesModule {
 }
 
 pub trait RepositoriesModuleExt {
-   type BankRepo: BankManagerRepository;
+    type BankRepo: BankManagerRepository;
 
-   fn bank_manager_repository(&self) -> &Self::BankRepo;
+    fn bank_manager_repository(&self) -> &Self::BankRepo;
 }
 
 impl RepositoriesModuleExt for RepositoriesModule {

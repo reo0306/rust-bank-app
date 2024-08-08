@@ -1,3 +1,3 @@
-pub mod routes;
-pub mod modules;
 pub mod model;
+pub mod modules;
+pub mod routes;

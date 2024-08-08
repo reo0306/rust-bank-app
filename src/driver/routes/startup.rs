@@ -1,18 +1,13 @@
 use anyhow::Result;
-use std::sync::Arc;
 use axum::{
-    routing::{get, patch, post}, Extension, Router
+    routing::{get, patch, post},
+    Extension, Router,
 };
+use std::sync::Arc;
 
 use crate::driver::{
     modules::Modules,
-    routes::bank::{
-        find_account,
-        create_account,
-        update_money,
-        find_histories,
-        create_history,
-    },
+    routes::bank::{create_account, create_history, find_account, find_histories, update_money},
 };
 
 pub async fn run(modules: Arc<Modules>) -> Result<()> {

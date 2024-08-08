@@ -1,11 +1,7 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
+use crate::app::model::bank::{CreateBankAccount, CreateDepositHistory, UpdateMoney};
 use crate::domain::model::bank::{BankAccount, DepositHistories};
-use crate::app::model::bank::{
-    CreateBankAccount,
-    CreateDepositHistory,
-    UpdateMoney,
-};
 
 #[derive(Debug, Serialize)]
 pub struct JsonAccountView {
@@ -65,9 +61,7 @@ impl From<JsonCreateHistory> for CreateDepositHistory {
 
 impl From<JsonUpdateMoney> for UpdateMoney {
     fn from(jum: JsonUpdateMoney) -> Self {
-        UpdateMoney {
-            money: jum.money,
-        } 
+        UpdateMoney { money: jum.money }
     }
 }
 
