@@ -24,6 +24,7 @@ pub async fn run(modules: Arc<Modules>) -> Result<()> {
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
 
+    println!("Server listening on {}", listener.local_addr().unwrap());
     axum::serve(listener, app)
         .await
         .unwrap_or_else(|_| panic!("Server cannnot launch!"));

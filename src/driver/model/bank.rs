@@ -34,7 +34,6 @@ pub struct JsonCreateHistory {
 
 #[derive(Debug, Deserialize)]
 pub struct JsonUpdateMoney {
-    pub id: String,
     pub money: i32,
 }
 
