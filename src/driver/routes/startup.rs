@@ -8,8 +8,7 @@ use std::sync::Arc;
 use crate::driver::{
     modules::Modules,
     routes::bank::{create_account, create_history, find_account, find_histories, update_money},
-    //routes::deposit_history::{find_dynamodb_histories, create_dynamodb_history},
-    routes::deposit_history::create_dynamodb_history,
+    routes::deposit_history::{find_dynamodb_history, create_dynamodb_history},
 };
 
 pub async fn run(modules: Arc<Modules>) -> Result<()> {
@@ -21,8 +20,8 @@ pub async fn run(modules: Arc<Modules>) -> Result<()> {
         .route("/money/:id", patch(update_money));
 
     let bank_dynamodb_router = Router::new()
-        .route("/history", post(create_dynamodb_history));
-        //.route("/history/:id", get(find_dynamodb_histories));
+        .route("/history", post(create_dynamodb_history))
+        .route("/history/:id", get(find_dynamodb_history));
 
     let app = Router::new()
         .nest("/bank", bank_router)

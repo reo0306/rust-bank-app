@@ -16,12 +16,12 @@ impl DepositHistoryUseCase {
         }
     }
 
-    /*pub async fn view_histories(&self, id: String) -> Result<Option<DepositHistories>> {
+    pub async fn view_history(&self, id: String) -> Result<Option<DepositHistories>> {
         self.repository
-            .find_histories(&id.try_into()?)
+            .find_history(&id.try_into()?)
             .await
-            .map(|histories| histories.map(|h| h.into()))
-    }*/
+            .map(|history| history.map(|h| h.into()))
+    }
 
     pub async fn add_history(&self, data: CreateDepositHistory) -> Result<()> {
         self.repository

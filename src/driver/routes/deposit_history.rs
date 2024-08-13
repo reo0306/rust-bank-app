@@ -8,14 +8,14 @@ use crate::driver::{
     modules::{Modules, ModulesExt},
 };
 
-/*pub async fn find_dynamodb_histories(
+pub async fn find_dynamodb_history(
     Extension(modules): Extension<Arc<Modules>>,
     Path(id): Path<String>,
 ) -> Result<impl IntoResponse, StatusCode> {
-    let res = modules.deposit_history_use_case().view_histories(id).await;
+    let res = modules.deposit_history_use_case().view_history(id).await;
 
     match res {
-        Ok(histories) => histories
+        Ok(history) => history
             .map(|data| {
                 let json: JsonHistoriesView = data.into();
 
@@ -26,7 +26,7 @@ use crate::driver::{
             Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
-}*/
+}
 
 pub async fn create_dynamodb_history(
     Extension(modules): Extension<Arc<Modules>>,
