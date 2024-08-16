@@ -3,15 +3,24 @@ use axum::{
     routing::{get, patch, post},
     Extension, Router,
 };
+use async_graphql::{
+    EmptyMutation,
+    EmptySubscription,
+    Schema,
+};
 use std::sync::Arc;
 
 use crate::driver::{
     modules::Modules,
     routes::bank::{create_account, create_history, find_account, find_histories, update_money},
     routes::deposit_history::{find_dynamodb_history, create_dynamodb_history},
+    routes::graphql::{graphql_playground, graphql_handler, not_found_handler},
 };
+use crate::adapter::repository::graphql::QueryRoot;
 
 pub async fn run(modules: Arc<Modules>) -> Result<()> {
+    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).finish(); 
+
     let bank_router = Router::new()
         .route("/", post(create_account))
         .route("/:id", get(find_account))
@@ -24,13 +33,17 @@ pub async fn run(modules: Arc<Modules>) -> Result<()> {
         .route("/history/:id", get(find_dynamodb_history));
 
     let app = Router::new()
+        .route("/", get(graphql_playground).post(graphql_handler))
+        .fallback(not_found_handler)
         .nest("/bank", bank_router)
         .nest("/bank/dynamodb", bank_dynamodb_router)
+        .layer(Extension(schema))
         .layer(Extension(modules));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
 
     println!("Server listening on {}", listener.local_addr().unwrap());
+
     axum::serve(listener, app)
         .await
         .unwrap_or_else(|_| panic!("Server cannnot launch!"));
