@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use ulid::Ulid;
 
 pub mod bank;
+pub mod graphql;
 
 #[derive(new, Debug, Clone, PartialEq, Eq)]
 pub struct Id<T> {

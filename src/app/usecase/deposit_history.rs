@@ -24,8 +24,6 @@ impl DepositHistoryUseCase {
     }
 
     pub async fn add_history(&self, data: CreateDepositHistory) -> Result<()> {
-        self.repository
-            .create_new_history(data.try_into()?)
-            .await
+        self.repository.create_new_history(data.try_into()?).await
     }
 }

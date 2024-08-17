@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
 use crate::domain::model::bank::{DepositHistories, NewDepositHistory};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DepositHistoriesDynamoTable {

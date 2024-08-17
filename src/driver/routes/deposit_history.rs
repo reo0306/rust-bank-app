@@ -2,9 +2,7 @@ use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, J
 use std::sync::Arc;
 
 use crate::driver::{
-    model::bank::{
-        JsonCreateHistory, JsonHistoriesView,
-    },
+    model::bank::{JsonCreateHistory, JsonHistoriesView},
     modules::{Modules, ModulesExt},
 };
 
@@ -22,9 +20,7 @@ pub async fn find_dynamodb_history(
                 (StatusCode::OK, Json(json))
             })
             .ok_or_else(|| StatusCode::NOT_FOUND),
-        Err(_) => {
-            Err(StatusCode::INTERNAL_SERVER_ERROR)
-        }
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
 
@@ -37,7 +33,5 @@ pub async fn create_dynamodb_history(
         .add_history(params.into())
         .await
         .map(|_| StatusCode::NO_CONTENT)
-        .map_err(|_| {
-            StatusCode::INTERNAL_SERVER_ERROR
-        })
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }

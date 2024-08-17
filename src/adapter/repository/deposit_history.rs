@@ -1,17 +1,15 @@
 use anyhow::Result;
-use std::sync::Arc;
 use aws_sdk_dynamodb::types::AttributeValue;
 use serde_dynamo::aws_sdk_dynamodb_1::{from_item, to_item};
+use std::sync::Arc;
 
 use crate::adapter::{
-    persistence::dynamodb::DynamoDB,
     model::deposit_history::{DepositHistoriesDynamoTable, NewDepositHistoryDynamoRecord},
+    persistence::dynamodb::DynamoDB,
 };
-use crate::domain::{
-    model::{
-        bank::{DepositHistories, NewDepositHistory},
-        Id,
-    },
+use crate::domain::model::{
+    bank::{DepositHistories, NewDepositHistory},
+    Id,
 };
 
 pub struct DepositHistoryRepository {
@@ -25,8 +23,12 @@ impl DepositHistoryRepository {
         }
     }
 
-    pub async fn find_history(&self, id: &Id<DepositHistories>) -> Result<Option<DepositHistories>> {
-        let resp = self.dynamodb
+    pub async fn find_history(
+        &self,
+        id: &Id<DepositHistories>,
+    ) -> Result<Option<DepositHistories>> {
+        let resp = self
+            .dynamodb
             .client
             .get_item()
             .table_name("DepositHistories")
@@ -34,7 +36,8 @@ impl DepositHistoryRepository {
             .send()
             .await?;
 
-        let depoisit_historiy_dynamo_table: DepositHistoriesDynamoTable = from_item(resp.item.clone().unwrap()).unwrap();
+        let depoisit_historiy_dynamo_table: DepositHistoriesDynamoTable =
+            from_item(resp.item.clone().unwrap()).unwrap();
 
         Ok(Some(depoisit_historiy_dynamo_table.try_into()?))
     }
@@ -60,10 +63,7 @@ mod deposit_history_dynamodb_test {
 
     use super::*;
     use crate::adapter::persistence::dynamodb::{init_client, DynamoDB};
-    use crate::domain::model::{
-        Id,
-        bank::NewDepositHistory
-    };
+    use crate::domain::model::{bank::NewDepositHistory, Id};
 
     #[tokio::test]
     async fn it_create_new_history() {
@@ -71,13 +71,14 @@ mod deposit_history_dynamodb_test {
         let dynamodb = DynamoDB::new(client);
         let repository = DepositHistoryRepository::new(dynamodb);
 
-        let result = repository.create_new_history(NewDepositHistory {
-            id: Id::new(Ulid::new()),
-            bank_account_id: "aaaa".to_string(),
-            action: "test".to_string(),
-            money: 9999,
-        }
-        ).await;
+        let result = repository
+            .create_new_history(NewDepositHistory {
+                id: Id::new(Ulid::new()),
+                bank_account_id: "aaaa".to_string(),
+                action: "test".to_string(),
+                money: 9999,
+            })
+            .await;
 
         assert!(result.is_ok());
     }

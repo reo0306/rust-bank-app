@@ -1,15 +1,21 @@
-use async_graphql::Object;
+use anyhow::Result;
 
-use crate::adapter::model::graphql::Ping;
+use crate::adapter::persistence::mysql::Db;
+use crate::domain::model::graphql::Ping;
 
-pub struct QueryRoot;
+pub struct BankQueryRepository {
+    db: Db,
+}
 
-#[Object]
-impl QueryRoot {
-  async fn ping(&self) -> Ping {
-    Ping { 
-      status: "ok".to_string(), 
-      code: 200 
+impl BankQueryRepository {
+    pub fn new(db: Db) -> Self {
+        Self { db }
     }
-  }
+
+    pub async fn ping(&self) -> Result<Ping> {
+        Ok(Ping {
+            status: "ok".to_string(),
+            code: 200,
+        })
+    }
 }

@@ -8,10 +8,7 @@ use crate::adapter::{
     },
     repository::deposit_history::DepositHistoryRepository,
 };
-use crate::app::usecase::{
-    bank::BankManagerUseCase,
-    deposit_history::DepositHistoryUseCase,
-};
+use crate::app::usecase::{bank::BankManagerUseCase, deposit_history::DepositHistoryUseCase};
 
 pub struct Modules {
     pub bank_manager_use_case: BankManagerUseCase<RepositoriesModule>,
@@ -43,10 +40,11 @@ impl Modules {
         let client = init_client().await;
         let dynamodb = DynamoDB::new(client);
 
-        let repositories_module = Arc::new(RepositoriesModule::new(db.clone()) );
+        let repositories_module = Arc::new(RepositoriesModule::new(db.clone()));
 
         let bank_manager_use_case = BankManagerUseCase::new(repositories_module.clone());
-        let deposit_history_use_case = DepositHistoryUseCase::new(DepositHistoryRepository::new(dynamodb));
+        let deposit_history_use_case =
+            DepositHistoryUseCase::new(DepositHistoryRepository::new(dynamodb));
 
         Self {
             bank_manager_use_case,

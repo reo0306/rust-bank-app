@@ -1,9 +1,9 @@
-use std::sync::Arc;
 use anyhow::Result;
+use std::sync::Arc;
 
 use aws_config::BehaviorVersion;
-use aws_sdk_dynamodb::Client;
 use aws_sdk_dynamodb::config::Builder;
+use aws_sdk_dynamodb::Client;
 
 /*
 use aws_sdk_dynamodb::config::endpoint::{Endpoint, EndpointFuture, Params, ResolveEndpoint};
@@ -36,9 +36,7 @@ pub async fn init_client() -> Client {
         .await;
 
     let dynamodb_local_config = Builder::from(&config)
-        .endpoint_url(
-            "http://172.21.0.7:8000",
-        )
+        .endpoint_url("http://172.21.0.7:8000")
         .build();
 
     let dynamodb = Client::from_conf(dynamodb_local_config);
@@ -86,11 +84,13 @@ mod dynamodb_test {
     async fn get_item(id: String) -> Result<Option<HashMap<String, AttributeValue>>> {
         let client = init_client().await;
         let dynamodb = DynamoDB::new(client);
-        let res = dynamodb.client.get_item()
-        .table_name("DepositHistories")
-        .key("id".to_string(), AttributeValue::S(id))
-        .send()
-        .await?;
+        let res = dynamodb
+            .client
+            .get_item()
+            .table_name("DepositHistories")
+            .key("id".to_string(), AttributeValue::S(id))
+            .send()
+            .await?;
 
         Ok(res.item)
     }
