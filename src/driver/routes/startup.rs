@@ -15,7 +15,9 @@ use crate::driver::{
 };
 
 pub async fn run(modules: Arc<Modules>) -> Result<()> {
-    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription).finish();
+    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
+        .data(modules.clone())
+        .finish();
 
     let bank_router = Router::new()
         .route("/", post(create_account))

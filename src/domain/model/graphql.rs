@@ -7,7 +7,7 @@ pub struct Ping {
 }
 
 #[derive(SimpleObject)]
-pub struct BankAccount {
+pub struct BankQueryAccount {
     pub bank_id: String,
     pub branch_office_id: String,
     pub name: String,

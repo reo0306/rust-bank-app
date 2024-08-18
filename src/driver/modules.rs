@@ -8,11 +8,12 @@ use crate::adapter::{
     },
     repository::deposit_history::DepositHistoryRepository,
 };
-use crate::app::usecase::{bank::BankManagerUseCase, deposit_history::DepositHistoryUseCase};
+use crate::app::usecase::{bank::BankManagerUseCase, deposit_history::DepositHistoryUseCase, graphql::BankQueryUseCase};
 
 pub struct Modules {
     pub bank_manager_use_case: BankManagerUseCase<RepositoriesModule>,
     pub deposit_history_use_case: DepositHistoryUseCase,
+    pub bank_query_use_case: BankQueryUseCase<RepositoriesModule>,
 }
 
 pub trait ModulesExt {
@@ -20,6 +21,7 @@ pub trait ModulesExt {
 
     fn bank_manager_use_case(&self) -> &BankManagerUseCase<Self::RepositoriesModule>;
     fn deposit_history_use_case(&self) -> &DepositHistoryUseCase;
+    fn bank_query_use_case(&self) -> &BankQueryUseCase<Self::RepositoriesModule>;
 }
 
 impl ModulesExt for Modules {
@@ -31,6 +33,10 @@ impl ModulesExt for Modules {
 
     fn deposit_history_use_case(&self) -> &DepositHistoryUseCase {
         &self.deposit_history_use_case
+    }
+
+    fn bank_query_use_case(&self) -> &BankQueryUseCase<Self::RepositoriesModule> {
+        &self.bank_query_use_case
     }
 }
 
@@ -45,10 +51,12 @@ impl Modules {
         let bank_manager_use_case = BankManagerUseCase::new(repositories_module.clone());
         let deposit_history_use_case =
             DepositHistoryUseCase::new(DepositHistoryRepository::new(dynamodb));
+        let bank_query_use_case = BankQueryUseCase::new(repositories_module.clone());
 
         Self {
             bank_manager_use_case,
             deposit_history_use_case,
+            bank_query_use_case,
         }
     }
 }

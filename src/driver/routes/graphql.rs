@@ -1,7 +1,7 @@
-//use std::sync::Arc;
+use std::sync::Arc;
 use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
-    EmptyMutation, EmptySubscription, Object, Request, Response, Schema,
+    EmptyMutation, EmptySubscription, Object, Request, Response, Schema, Context,
 };
 use axum::{
     http::StatusCode,
@@ -9,30 +9,32 @@ use axum::{
     Extension, Json,
 };
 
-//use crate::driver::modules::Modules;
-use crate::adapter::{persistence::mysql::Db, repository::graphql::BankQueryRepository};
-use crate::app::usecase::graphql::BankQuery;
-use crate::domain::model::graphql::Ping;
+use crate::driver::modules::{Modules, ModulesExt};
+use crate::domain::model::graphql::{Ping, BankQueryAccount};
 
 pub struct QueryRoot;
 
 #[Object]
 impl QueryRoot {
-    async fn ping(&self) -> Ping {
-        let db = Db::new().await;
-        let bank_query = BankQuery::new(BankQueryRepository::new(db.clone()));
+    async fn ping(&self, ctx: &Context<'_>) -> Ping {
+        let modules = ctx.data_unchecked::<Arc<Modules>>();
+        modules.bank_query_use_case().ping().await
+    }
 
-        bank_query.ping().await
+    async fn find(&self, ctx: &Context<'_>, id: String) -> BankQueryAccount {
+        let modules = ctx.data_unchecked::<Arc<Modules>>();
+        let res = modules.bank_query_use_case().view_account(id).await;
+
+        match res {
+            Ok(account) => account.unwrap(),
+            Err(e) => panic!("error: {}", e),
+        }
     }
 }
 
 pub type BankSchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 
-pub async fn graphql_handler(
-    schema: Extension<BankSchema>,
-    //Extension(modules): Extension<Arc<Modules>>,
-    req: Json<Request>,
-) -> Json<Response> {
+pub async fn graphql_handler(schema: Extension<BankSchema>, req: Json<Request>) -> Json<Response> {
     schema.execute(req.0).await.into()
 }
 
