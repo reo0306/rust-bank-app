@@ -3,6 +3,7 @@ use derive_new::new;
 use std::sync::Arc;
 
 use crate::adapter::module::RepositoriesModuleExt;
+use crate::app::model::graphql::CreateBankMutationAccount;
 use crate::domain::{
   model::graphql::{Ping, BankQueryAccount},
   repository::graphql::BankQueryRepository,
@@ -25,29 +26,13 @@ impl<R: RepositoriesModuleExt> BankQueryUseCase<R> {
         .await
         .map(|account| account.map(|a| a.into()))
   }
+
+  //pub async fn add_account(&self, data: CreateBankMutationAccount) -> Result<()> {
+  pub async fn add_account(&self, data: CreateBankMutationAccount) -> Result<Option<BankQueryAccount>> {
+    self.repositories
+        .bank_query_repository()
+        .create_new_account(data.try_into()?)
+        .await
+        .map(|account| account.map(|a| a.into()))
+  }
 }
-
-/*
-use crate::adapter::repository::graphql::BankQueryRepository;
-use crate::domain::model::graphql::{Ping, BankQueryAccount};
-
-pub struct BankQuery {
-    repository: BankQueryRepository,
-}
-
-impl BankQuery {
-    pub fn new(repository: BankQueryRepository) -> Self {
-        Self { repository }
-    }
-
-    pub async fn ping(&self) -> Ping {
-        self.repository.ping().await.unwrap()
-    }
-
-    pub async fn view_accounts(&self) -> BankAccount {
-        self.repositories
-            .find_account()
-            .await
-            .map(|account| account.map(|a| a.into()))
-    }
-}*/

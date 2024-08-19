@@ -1,12 +1,12 @@
 use anyhow::Result;
-use async_graphql::{EmptyMutation, EmptySubscription, Schema};
+use async_graphql::{EmptySubscription, Schema};
 use axum::{
     routing::{get, patch, post},
     Extension, Router,
 };
 use std::sync::Arc;
 
-use crate::driver::routes::graphql::QueryRoot;
+use crate::driver::routes::resolver::{QueryRoot, MutationRoot};
 use crate::driver::{
     modules::Modules,
     routes::bank::{create_account, create_history, find_account, find_histories, update_money},
@@ -15,7 +15,7 @@ use crate::driver::{
 };
 
 pub async fn run(modules: Arc<Modules>) -> Result<()> {
-    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
+    let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
         .data(modules.clone())
         .finish();
 

@@ -2,11 +2,11 @@ use anyhow::Result;
 use async_trait::async_trait;
 
 use super::DatabaseRepositoryImpl;
-use crate::adapter::model::graphql::BankQueryAccountTable;
+use crate::adapter::model::graphql::{BankQueryAccountTable, NewBankMutationAccountRecord};
 use crate::domain::{
     model::{
         Id,
-        graphql::{Ping, BankQueryAccount},
+        graphql::{Ping, BankQueryAccount, NewBankMutationAccount},
     },
     repository::graphql::BankQueryRepository,
 };
@@ -35,27 +35,44 @@ impl BankQueryRepository for DatabaseRepositoryImpl<BankQueryAccount> {
 
         bank_account_table.map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
     }
-}
 
-/*use anyhow::Result;
+    async fn create_new_account(&self, params: NewBankMutationAccount) -> Result<Option<BankQueryAccount>> {
+        let pool = self.pool.0.clone();
 
-use crate::adapter::persistence::mysql::Db;
-use crate::domain::model::graphql::Ping;
+        let new_bank_account_record: NewBankMutationAccountRecord = params.try_into()?;
 
-pub struct BankQueryRepository {
-    db: Db,
-}
+        let res = sqlx::query_as::<_, BankQueryAccountTable>(
+            r#"
+            INSERT INTO bank_accounts (id, bank_id, branch_office_id, name, money) VALUES(?, ?, ?, ?, ?)
+            returning
+              bank_id, branch_office_id, name, money
+            "#,
+        )
+        .bind(new_bank_account_record.id)
+        .bind(new_bank_account_record.bank_id)
+        .bind(new_bank_account_record.branch_office_id)
+        .bind(new_bank_account_record.name)
+        .bind(new_bank_account_record.money)
+        .fetch_one(&*pool)
+        .await
+        .ok();
 
-impl BankQueryRepository {
-    pub fn new(db: Db) -> Self {
-        Self { db }
+        res.map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
+
+        /*sqlx::query(
+            r#"
+            INSERT INTO bank_accounts (id, bank_id, branch_office_id, name, money) VALUES(?, ?, ?, ?, ?);
+            "#,
+        )
+        .bind(new_bank_account_record.id)
+        .bind(new_bank_account_record.bank_id)
+        .bind(new_bank_account_record.branch_office_id)
+        .bind(new_bank_account_record.name)
+        .bind(new_bank_account_record.money)
+        .execute(&*pool)
+        .await?;
+
+        Ok(())
+        */
     }
-
-    pub async fn ping(&self) -> Result<Ping> {
-        Ok(Ping {
-            status: "ok".to_string(),
-            code: 200,
-        })
-    }
 }
-*/

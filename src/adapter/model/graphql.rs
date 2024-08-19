@@ -1,6 +1,6 @@
 use sqlx::FromRow;
 
-use crate::domain::model::graphql::BankQueryAccount;
+use crate::domain::model::graphql::{BankQueryAccount, NewBankMutationAccount};
 
 #[derive(FromRow)]
 pub struct BankQueryAccountTable {
@@ -10,7 +10,7 @@ pub struct BankQueryAccountTable {
     pub money: i32,
 }
 
-pub struct NewBankQueryAccountRecord {
+pub struct NewBankMutationAccountRecord {
     pub id: String,
     pub bank_id: String,
     pub branch_office_id: String,
@@ -31,12 +31,11 @@ impl TryFrom<BankQueryAccountTable> for BankQueryAccount {
     }
 }
 
-/*
-impl TryFrom<NewBankQueryAccount> for NewBankAccountRecord {
+impl TryFrom<NewBankMutationAccount> for NewBankMutationAccountRecord {
     type Error = anyhow::Error;
 
-    fn try_from(nba: NewBankAccount) -> Result<Self, Self::Error> {
-        Ok(NewBankAccountRecord {
+    fn try_from(nba: NewBankMutationAccount) -> Result<Self, Self::Error> {
+        Ok(NewBankMutationAccountRecord {
             id: nba.id.value.to_string(),
             bank_id: nba.bank_id,
             branch_office_id: nba.branch_office_id,
@@ -45,4 +44,3 @@ impl TryFrom<NewBankQueryAccount> for NewBankAccountRecord {
         })
     }
 }
-*/
