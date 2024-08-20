@@ -41,38 +41,29 @@ impl BankQueryRepository for DatabaseRepositoryImpl<BankQueryAccount> {
 
         let new_bank_account_record: NewBankMutationAccountRecord = params.try_into()?;
 
-        let res = sqlx::query_as::<_, BankQueryAccountTable>(
+        sqlx::query(
             r#"
-            INSERT INTO bank_accounts (id, bank_id, branch_office_id, name, money) VALUES(?, ?, ?, ?, ?)
-            returning
-              bank_id, branch_office_id, name, money
+            INSERT INTO bank_accounts (id, bank_id, branch_office_id, name, money) VALUES(?, ?, ?, ?, ?);
             "#,
         )
-        .bind(new_bank_account_record.id)
-        .bind(new_bank_account_record.bank_id)
-        .bind(new_bank_account_record.branch_office_id)
-        .bind(new_bank_account_record.name)
+        .bind(&new_bank_account_record.id)
+        .bind(&new_bank_account_record.bank_id)
+        .bind(&new_bank_account_record.branch_office_id)
+        .bind(&new_bank_account_record.name)
         .bind(new_bank_account_record.money)
+        .execute(&*pool)
+        .await?;
+
+        let res = sqlx::query_as::<_, BankQueryAccountTable>(
+            r#"
+            SELECT bank_id, branch_office_id, name, money from bank_accounts WHERE id = ?;
+            "#,
+        )
+        .bind(&new_bank_account_record.id)
         .fetch_one(&*pool)
         .await
         .ok();
 
         res.map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
-
-        /*sqlx::query(
-            r#"
-            INSERT INTO bank_accounts (id, bank_id, branch_office_id, name, money) VALUES(?, ?, ?, ?, ?);
-            "#,
-        )
-        .bind(new_bank_account_record.id)
-        .bind(new_bank_account_record.bank_id)
-        .bind(new_bank_account_record.branch_office_id)
-        .bind(new_bank_account_record.name)
-        .bind(new_bank_account_record.money)
-        .execute(&*pool)
-        .await?;
-
-        Ok(())
-        */
     }
 }
