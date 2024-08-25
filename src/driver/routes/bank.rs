@@ -50,6 +50,27 @@ pub async fn find_histories(
     }
 }
 
+pub async fn download_histories(
+    Extension(modules): Extension<Arc<Modules>>,
+    Path(id): Path<String>,
+) -> Result<impl IntoResponse, StatusCode> {
+    let res = modules.bank_manager_use_case().download_histories(id).await;
+
+    match res {
+        Ok(dl_histories) => dl_histories
+            .map(|data| {
+                let json: JsonHistoriesView = data.into();
+
+                (StatusCode::OK, Json(json))
+            })
+            .ok_or_else(|| StatusCode::NOT_FOUND),
+        Err(_) => {
+            //error!("Find history error: {:?}", err);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+
 pub async fn create_account(
     Extension(modules): Extension<Arc<Modules>>,
     Json(params): Json<JsonCreateAccount>,

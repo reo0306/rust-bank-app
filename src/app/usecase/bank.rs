@@ -5,7 +5,7 @@ use std::sync::Arc;
 use crate::adapter::module::RepositoriesModuleExt;
 use crate::app::model::bank::{CreateBankAccount, CreateDepositHistory, UpdateMoney};
 use crate::domain::{
-    model::bank::{BankAccount, DepositHistories},
+    model::bank::{BankAccount, DepositHistories, DepositDownloadHistories},
     repository::bank::BankManagerRepository,
 };
 
@@ -44,6 +44,15 @@ impl<R: RepositoriesModuleExt> BankManagerUseCase<R> {
             .create_new_history(data.try_into()?)
             .await
     }
+
+    pub async fn download_histories(&self, id: String) -> Result<Option<Vec<DepositDownloadHistories>>> {
+        self.repositories
+            .bank_manager_repository()
+            .download_histories(&id.try_into()?)
+            .await
+            .map(|histories| histories.map(|h| h.into()))
+    }
+
 
     pub async fn manage_money(&self, id: String, data: UpdateMoney) -> Result<()> {
         self.repositories

@@ -18,6 +18,14 @@ pub struct DepositHistories {
 }
 
 #[derive(new, PartialEq, Debug, Clone)]
+pub struct DepositDownloadHistories {
+    pub id: String,
+    pub bank_account_id: String,
+    pub action: String,
+    pub money: i32,
+}
+
+#[derive(new, PartialEq, Debug, Clone)]
 pub struct NewBankAccount {
     pub id: Id<BankAccount>,
     pub bank_id: String,

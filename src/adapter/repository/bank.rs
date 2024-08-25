@@ -8,7 +8,7 @@ use crate::adapter::model::bank::{
 };
 use crate::domain::{
     model::{
-        bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, RenewMoney},
+        bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, DepositDownloadHistories, RenewMoney},
         Id,
     },
     repository::bank::BankManagerRepository,
@@ -88,6 +88,26 @@ impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
 
         Ok(())
     }
+
+    async fn find_download_histories(&self, id: &Id<DepositHistories>) -> Result<Option<Vec<DepositDownloadHistories>>> {
+        let pool = self.pool.0.clone();
+
+        let deposit_histories_table = sqlx::query_as::<_, DepositHistoriesTable>(
+            r#"
+            SELECT id, bank_account_id, action, money FROM deposit_histories WHERE bank_account_id = ?;
+            "#,
+        )
+        .bind(id.value.to_string())
+        .fetch_all(&*pool)
+        .await
+        .ok();
+
+        deposit_histories_table.map_or(
+            Ok(Some(vec![DepositDownloadHistories::new()])),
+            |data| Ok(Some(data.try_into()?))
+        )
+    }
+
 
     async fn update_money(&self, id: &Id<BankAccount>, params: RenewMoney) -> Result<()> {
         let pool = self.pool.0.clone();

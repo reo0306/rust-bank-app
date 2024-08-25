@@ -2,7 +2,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 
 use crate::domain::model::{
-    bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, RenewMoney},
+    bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, DepositDownloadHistories, RenewMoney},
     Id,
 };
 
@@ -13,5 +13,6 @@ pub trait BankManagerRepository {
     async fn find_histories(&self, id: &Id<DepositHistories>) -> Result<Option<DepositHistories>>;
     async fn create_new_account(&self, params: NewBankAccount) -> Result<()>;
     async fn create_new_history(&self, params: NewDepositHistory) -> Result<()>;
+    async fn find_download_histories(&self, id: &Id<DepositHistories>) -> Result<Option<Vec<DepositDownloadHistories>>>;
     async fn update_money(&self, id: &Id<BankAccount>, params: RenewMoney) -> Result<()>;
 }

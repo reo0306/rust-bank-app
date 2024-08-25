@@ -1,7 +1,7 @@
 use sqlx::FromRow;
 
 use crate::domain::model::bank::{
-    BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, RenewMoney,
+    BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, DepositDownloadHistories, RenewMoney,
 };
 
 #[derive(FromRow)]
@@ -60,6 +60,25 @@ impl TryFrom<DepositHistoriesTable> for DepositHistories {
             action: dht.action,
             money: dht.money,
         })
+    }
+}
+
+impl TryFrom<DepositHistoriesTable> for DepositDownloadHistories {
+    type Error = anyhow::Error;
+
+    fn try_from(dht: DepositHistoriesTable) -> Result<Self, Self::Error> {
+        let mut ddh: Vec<DepositDownloadHistories> = Vec::new();
+
+        dht.map(|data|
+            ddh.push(
+                DepositHistories {
+                    id: data.id,
+                    bank_account_id: data.bank_account_id,
+                    action: data.action,
+                    money: data.money,
+                }
+            )
+        )
     }
 }
 
