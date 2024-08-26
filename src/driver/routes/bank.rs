@@ -1,5 +1,14 @@
-use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, Json};
+use axum::{
+    extract::Path,
+    http::StatusCode,
+    response::IntoResponse,
+    body::Body,
+    Extension,
+    Json,
+};
 use std::sync::Arc;
+
+use http::header;
 
 use crate::driver::{
     model::bank::{
@@ -23,7 +32,6 @@ pub async fn find_account(
             })
             .ok_or_else(|| StatusCode::NOT_FOUND),
         Err(_) => {
-            //error!("Find account error: {:?}", err);
             Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
@@ -44,7 +52,6 @@ pub async fn find_histories(
             })
             .ok_or_else(|| StatusCode::NOT_FOUND),
         Err(_) => {
-            //error!("Find history error: {:?}", err);
             Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
@@ -59,13 +66,20 @@ pub async fn download_histories(
     match res {
         Ok(dl_histories) => dl_histories
             .map(|data| {
-                let json: JsonHistoriesView = data.into();
+                let stream = ReaderStream::new(&data[..]);
+                let body = Body::from_stream(stream);
+                let headers = [
+                    (header::CONTENT_TYPE, "application/json; charset=utf-8"),
+                    (
+                        header::CONTENT_DISPOSITION,
+                        "atachment; filename=\"test.json\"",
+                    ),
+                ];
 
-                (StatusCode::OK, Json(json))
+                (headers, body).into_response()
             })
             .ok_or_else(|| StatusCode::NOT_FOUND),
         Err(_) => {
-            //error!("Find history error: {:?}", err);
             Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
@@ -81,7 +95,6 @@ pub async fn create_account(
         .await
         .map(|_| StatusCode::NO_CONTENT)
         .map_err(|_| {
-            //error!("Create account error: {}", err);
             StatusCode::INTERNAL_SERVER_ERROR
         })
 }
@@ -96,7 +109,6 @@ pub async fn create_history(
         .await
         .map(|_| StatusCode::NO_CONTENT)
         .map_err(|_| {
-            //error!("Create history error: {}", err);
             StatusCode::INTERNAL_SERVER_ERROR
         })
 }
@@ -112,7 +124,6 @@ pub async fn update_money(
         .await
         .map(|_| StatusCode::NO_CONTENT)
         .map_err(|_| {
-            //error!("Update money error: {}", err);
             StatusCode::INTERNAL_SERVER_ERROR
         })
 }

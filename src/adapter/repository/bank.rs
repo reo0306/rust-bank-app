@@ -3,7 +3,7 @@ use async_trait::async_trait;
 
 use super::DatabaseRepositoryImpl;
 use crate::adapter::model::bank::{
-    BankAccountTable, DepositHistoriesTable, NewBankAccountRecord, NewDepositHistoryRecord,
+    BankAccountTable, DepositHistoriesTable, DepositDownloadHistoriesTable, NewBankAccountRecord, NewDepositHistoryRecord,
     RenewMoneyRecord,
 };
 use crate::domain::{
@@ -92,7 +92,7 @@ impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
     async fn find_download_histories(&self, id: &Id<DepositHistories>) -> Result<Option<Vec<DepositDownloadHistories>>> {
         let pool = self.pool.0.clone();
 
-        let deposit_histories_table = sqlx::query_as::<_, DepositHistoriesTable>(
+        let deposit_histories_table = sqlx::query_as::<_, DepositDownloadHistoriesTable>(
             r#"
             SELECT id, bank_account_id, action, money FROM deposit_histories WHERE bank_account_id = ?;
             "#,
@@ -102,10 +102,17 @@ impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
         .await
         .ok();
 
-        deposit_histories_table.map_or(
-            Ok(Some(vec![DepositDownloadHistories::new()])),
-            |data| Ok(Some(data.try_into()?))
-        )
+        let mut ddh: Vec<DepositDownloadHistories> = Vec::new();
+
+        match deposit_histories_table {
+            Some(dht) => {
+                for data in dht {
+                    ddh.push(data.try_into()?)
+                }
+                Ok(Some(ddh))
+            }
+            None => Ok(Some(ddh))
+        }
     }
 
 

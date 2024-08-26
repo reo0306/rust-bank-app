@@ -19,6 +19,15 @@ pub struct DepositHistoriesTable {
     pub money: i32,
 }
 
+#[derive(FromRow)]
+pub struct DepositDownloadHistoriesTable {
+    pub id: String,
+    pub bank_account_id: String,
+    pub action: String,
+    pub money: i32,
+}
+
+
 pub struct NewBankAccountRecord {
     pub id: String,
     pub bank_id: String,
@@ -63,22 +72,16 @@ impl TryFrom<DepositHistoriesTable> for DepositHistories {
     }
 }
 
-impl TryFrom<DepositHistoriesTable> for DepositDownloadHistories {
+impl TryFrom<DepositDownloadHistoriesTable> for DepositDownloadHistories {
     type Error = anyhow::Error;
 
-    fn try_from(dht: DepositHistoriesTable) -> Result<Self, Self::Error> {
-        let mut ddh: Vec<DepositDownloadHistories> = Vec::new();
-
-        dht.map(|data|
-            ddh.push(
-                DepositHistories {
-                    id: data.id,
-                    bank_account_id: data.bank_account_id,
-                    action: data.action,
-                    money: data.money,
-                }
-            )
-        )
+    fn try_from(dht: DepositDownloadHistoriesTable) -> Result<Self, Self::Error> {
+        Ok(DepositDownloadHistories {
+            id: dht.id,
+            bank_account_id: dht.bank_account_id,
+            action: dht.action,
+            money: dht.money,
+        })
     }
 }
 

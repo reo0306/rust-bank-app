@@ -48,9 +48,27 @@ impl<R: RepositoriesModuleExt> BankManagerUseCase<R> {
     pub async fn download_histories(&self, id: String) -> Result<Option<Vec<DepositDownloadHistories>>> {
         self.repositories
             .bank_manager_repository()
-            .download_histories(&id.try_into()?)
+            .find_download_histories(&id.try_into()?)
             .await
-            .map(|histories| histories.map(|h| h.into()))
+            .map(|download_histories| download_histories.map(|dh| dh.into()))
+
+        /*let download_histories = self.repositories
+            .bank_manager_repository()
+            .download_histories(&id.try_into()?)
+            .await?;
+
+        let mut ddh : Vec<DepositDownloadHistories> = Vec::new(); 
+
+        match download_histories {
+            Some(download_histories) => {
+                for dh in download_histories {
+                    ddh.push(DepositDownloadHistories::new(dh))
+                }
+    
+                Ok(ddh)
+            }
+            None => Ok(ddh),
+        }*/
     }
 
 
