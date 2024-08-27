@@ -1,18 +1,20 @@
 use axum::{
     extract::Path,
-    http::StatusCode,
+    http::{header, HeaderMap, HeaderValue, StatusCode},
     response::IntoResponse,
     body::Body,
     Extension,
     Json,
 };
-use std::sync::Arc;
-
-use http::header;
+use std::{
+    io::Cursor,
+    sync::Arc
+};
+use tokio_util::io::ReaderStream;
 
 use crate::driver::{
     model::bank::{
-        JsonAccountView, JsonCreateAccount, JsonCreateHistory, JsonHistoriesView, JsonUpdateMoney,
+        JsonAccountView, JsonCreateAccount, JsonCreateHistory, JsonHistoriesView, JsonHistoriesDownload, JsonUpdateMoney,
     },
     modules::{Modules, ModulesExt},
 };
@@ -66,15 +68,19 @@ pub async fn download_histories(
     match res {
         Ok(dl_histories) => dl_histories
             .map(|data| {
-                let stream = ReaderStream::new(&data[..]);
+                let json: Vec<JsonHistoriesDownload> = data.into_iter().map(|d| d.into()).collect();
+                let json_data = serde_json::to_vec(&json).expect("error");
+                let cursor = Cursor::new(json_data);
+
+                let stream = ReaderStream::new(cursor);
                 let body = Body::from_stream(stream);
-                let headers = [
-                    (header::CONTENT_TYPE, "application/json; charset=utf-8"),
-                    (
-                        header::CONTENT_DISPOSITION,
-                        "atachment; filename=\"test.json\"",
-                    ),
-                ];
+
+                let mut headers = HeaderMap::new();
+                headers.insert(header::CONTENT_TYPE, HeaderValue::from_static("application/json"));
+                headers.insert(
+                    header::CONTENT_DISPOSITION,
+                    HeaderValue::from_static("attachment; filename=\"deposit_histories.json\""),
+                );
 
                 (headers, body).into_response()
             })

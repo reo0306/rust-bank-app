@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::app::model::bank::{CreateBankAccount, CreateDepositHistory, UpdateMoney};
-use crate::domain::model::bank::{BankAccount, DepositHistories};
+use crate::domain::model::bank::{BankAccount, DepositHistories, DepositDownloadHistories};
 
 #[derive(Debug, Serialize)]
 pub struct JsonAccountView {
@@ -13,6 +13,14 @@ pub struct JsonAccountView {
 
 #[derive(Debug, Serialize)]
 pub struct JsonHistoriesView {
+    pub action: String,
+    pub money: i32,
+}
+
+#[derive(Debug, Serialize)]
+pub struct JsonHistoriesDownload {
+    pub id: String,
+    pub bank_account_id: String,
     pub action: String,
     pub money: i32,
 }
@@ -80,6 +88,17 @@ impl From<DepositHistories> for JsonHistoriesView {
         JsonHistoriesView {
             action: dh.action,
             money: dh.money,
+        }
+    }
+}
+
+impl From<DepositDownloadHistories> for JsonHistoriesDownload {
+    fn from(ddh: DepositDownloadHistories) -> Self {
+        JsonHistoriesDownload {
+            id: ddh.id,
+            bank_account_id: ddh.bank_account_id,
+            action: ddh.action,
+            money: ddh.money,
         }
     }
 }
