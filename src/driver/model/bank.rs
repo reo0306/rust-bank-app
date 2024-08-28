@@ -30,6 +30,7 @@ pub struct JsonCreateAccount {
     pub bank_id: String,
     pub branch_office_id: String,
     pub name: String,
+    pub password: String,
     pub money: i32,
 }
 
@@ -51,6 +52,7 @@ impl From<JsonCreateAccount> for CreateBankAccount {
             bank_id: jca.bank_id,
             branch_office_id: jca.branch_office_id,
             name: jca.name,
+            password: jca.password,
             money: jca.money,
         }
     }

@@ -31,6 +31,7 @@ pub struct NewBankAccount {
     pub bank_id: String,
     pub branch_office_id: String,
     pub name: String,
+    pub password: String,
     pub money: i32,
 }
 

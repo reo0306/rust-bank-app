@@ -55,13 +55,14 @@ impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
 
         sqlx::query(
             r#"
-            INSERT INTO bank_accounts (id, bank_id, branch_office_id, name, money) VALUES(?, ?, ?, ?, ?);
+            INSERT INTO bank_accounts (id, bank_id, branch_office_id, name, password, money) VALUES(?, ?, ?, ?, ?, ?);
             "#,
         )
         .bind(new_bank_account_record.id)
         .bind(new_bank_account_record.bank_id)
         .bind(new_bank_account_record.branch_office_id)
         .bind(new_bank_account_record.name)
+        .bind(new_bank_account_record.password)
         .bind(new_bank_account_record.money)
         .execute(&*pool)
         .await?;

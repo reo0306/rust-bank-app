@@ -33,6 +33,7 @@ pub struct NewBankAccountRecord {
     pub bank_id: String,
     pub branch_office_id: String,
     pub name: String,
+    pub password: String,
     pub money: i32,
 }
 
@@ -94,6 +95,7 @@ impl TryFrom<NewBankAccount> for NewBankAccountRecord {
             bank_id: nba.bank_id,
             branch_office_id: nba.branch_office_id,
             name: nba.name,
+            password: nba.password,
             money: nba.money,
         })
     }

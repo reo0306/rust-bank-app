@@ -1,4 +1,15 @@
 use derive_new::new;
+use argon2::{
+    password_hash::{
+        rand_core::OsRng,
+        SaltString,
+        PasswordHasher,
+    },
+    Algorithm,
+    Version,
+    Params,
+    Argon2
+};
 
 use crate::domain::model::{
     bank::{NewBankAccount, NewDepositHistory, RenewMoney},
@@ -10,6 +21,7 @@ pub struct CreateBankAccount {
     pub bank_id: String,
     pub branch_office_id: String,
     pub name: String,
+    pub password: String,
     pub money: i32,
 }
 
@@ -31,11 +43,26 @@ impl TryFrom<CreateBankAccount> for NewBankAccount {
     fn try_from(cba: CreateBankAccount) -> anyhow::Result<Self, Self::Error> {
         let new_bank_account_id = Id::gen();
 
+        let salt = SaltString::generate(&mut OsRng);
+        //let argo2 = Argon2::default();
+        //let password_hash = argo2.hash_password(cba.password.as_bytes(), &salt).unwrap().to_string();
+
+        //let salt = SaltString::generate(&mut rand::thread_rng());
+        let password_hash = Argon2::new(
+            Algorithm::Argon2id,
+            Version::V0x13,
+            Params::new(15000, 2, 1, None).unwrap(),
+        )
+        .hash_password(cba.password.as_bytes(), &salt)
+        .unwrap()
+        .to_string();
+
         Ok(NewBankAccount::new(
             new_bank_account_id,
             cba.bank_id,
             cba.branch_office_id,
             cba.name,
+            password_hash,
             cba.money,
         ))
     }
