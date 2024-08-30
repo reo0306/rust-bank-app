@@ -51,24 +51,6 @@ impl<R: RepositoriesModuleExt> BankManagerUseCase<R> {
             .find_download_histories(&id.try_into()?)
             .await
             .map(|download_histories| download_histories.map(|dh| dh.into()))
-
-        /*let download_histories = self.repositories
-            .bank_manager_repository()
-            .download_histories(&id.try_into()?)
-            .await?;
-
-        let mut ddh : Vec<DepositDownloadHistories> = Vec::new(); 
-
-        match download_histories {
-            Some(download_histories) => {
-                for dh in download_histories {
-                    ddh.push(DepositDownloadHistories::new(dh))
-                }
-    
-                Ok(ddh)
-            }
-            None => Ok(ddh),
-        }*/
     }
 
 
@@ -78,6 +60,15 @@ impl<R: RepositoriesModuleExt> BankManagerUseCase<R> {
             .update_money(&id.try_into()?, data.try_into()?)
             .await
     }
+
+    pub async fn login_account(&self, data: LoginBankAccount) -> Result<Option<SignupBankAccount>> {
+        let account = self.repositories
+            .bank_manager_repository()
+            .find_login_account(data.id.try_into()?)
+            .await
+            .map(|login_account| login_account.map(|la| la.into()))
+    }
+
 }
 
 /*#[cfg(test)]

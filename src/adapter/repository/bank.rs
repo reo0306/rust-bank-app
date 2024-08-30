@@ -8,7 +8,9 @@ use crate::adapter::model::bank::{
 };
 use crate::domain::{
     model::{
-        bank::{BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, DepositDownloadHistories, RenewMoney},
+        bank::{
+            BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, DepositDownloadHistories, RenewMoney, SignupBankAccount,
+        },
         Id,
     },
     repository::bank::BankManagerRepository,
@@ -134,6 +136,21 @@ impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
 
         Ok(())
     }
+
+    async fn find_login_account(&self, id: &Id<BankAccount>) -> Result<Option<SignupBankAccount>> {
+        let pool = self.pool.0.clone();
+
+        let signup_bank_account_table = sqlx::query_as::<_, SignupBankAccountTable>(
+            r#"
+            SELECT id, password FROM bank_accounts WHERE id = ?;
+            "#,
+        )
+        .bind(id.value.to_string())
+        .fetch_one(&*pool)
+        .await
+        .ok();
+
+        signup_bank_account_table.map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
 }
 
 #[cfg(test)]

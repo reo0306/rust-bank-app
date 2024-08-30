@@ -14,7 +14,7 @@ use tokio_util::io::ReaderStream;
 
 use crate::driver::{
     model::bank::{
-        JsonAccountView, JsonCreateAccount, JsonCreateHistory, JsonHistoriesView, JsonHistoriesDownload, JsonUpdateMoney,
+        JsonAccountView, JsonCreateAccount, JsonCreateHistory, JsonHistoriesView, JsonHistoriesDownload, JsonUpdateMoney, JsonLoginView,
     },
     modules::{Modules, ModulesExt},
 };
@@ -127,6 +127,20 @@ pub async fn update_money(
     modules
         .bank_manager_use_case()
         .manage_money(id, params.into())
+        .await
+        .map(|_| StatusCode::NO_CONTENT)
+        .map_err(|_| {
+            StatusCode::INTERNAL_SERVER_ERROR
+        })
+}
+
+pub async fn login_account(
+    Extension(modules): Extension<Arc<Modules>>,
+    Json(params): Json<JsonLoginView>,
+) -> Result<impl IntoResponse, StatusCode> {
+    modules
+        .bank_manager_use_case()
+        .login_account(params.into())
         .await
         .map(|_| StatusCode::NO_CONTENT)
         .map_err(|_| {

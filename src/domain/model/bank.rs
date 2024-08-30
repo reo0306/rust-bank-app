@@ -47,3 +47,9 @@ pub struct NewDepositHistory {
 pub struct RenewMoney {
     pub money: i32,
 }
+
+#[derive(new, PartialEq, Debug, Clone)]
+pub struct SignupBankAccount {
+    pub id: String,
+    pub password: String,
+}

@@ -12,7 +12,7 @@ use argon2::{
 };
 
 use crate::domain::model::{
-    bank::{NewBankAccount, NewDepositHistory, RenewMoney},
+    bank::{NewBankAccount, NewDepositHistory, RenewMoney, LoginBankAccount},
     Id,
 };
 
@@ -37,6 +37,12 @@ pub struct UpdateMoney {
     pub money: i32,
 }
 
+#[derive(new)]
+pub struct LoginAccount {
+    pub id: String,
+    pub password: String,
+}
+
 impl TryFrom<CreateBankAccount> for NewBankAccount {
     type Error = anyhow::Error;
 
@@ -44,10 +50,11 @@ impl TryFrom<CreateBankAccount> for NewBankAccount {
         let new_bank_account_id = Id::gen();
 
         let salt = SaltString::generate(&mut OsRng);
-        //let argo2 = Argon2::default();
-        //let password_hash = argo2.hash_password(cba.password.as_bytes(), &salt).unwrap().to_string();
+        let argo2 = Argon2::default();
+        let password_hash = argo2.hash_password(cba.password.as_bytes(), &salt).unwrap().to_string();
 
-        //let salt = SaltString::generate(&mut rand::thread_rng());
+    /*
+        // custom
         let password_hash = Argon2::new(
             Algorithm::Argon2id,
             Version::V0x13,
@@ -56,6 +63,7 @@ impl TryFrom<CreateBankAccount> for NewBankAccount {
         .hash_password(cba.password.as_bytes(), &salt)
         .unwrap()
         .to_string();
+    */
 
         Ok(NewBankAccount::new(
             new_bank_account_id,
@@ -88,5 +96,14 @@ impl TryFrom<UpdateMoney> for RenewMoney {
 
     fn try_from(um: UpdateMoney) -> anyhow::Result<Self, Self::Error> {
         Ok(RenewMoney::new(um.money))
+    }
+}
+
+
+impl TryFrom<LoginAccount> for LoginBankAccount {
+    type Error = anyhow::Error;
+
+    fn try_from(la: LoginAccount) -> anyhow::Result<Self, Self::Error> {
+        Ok(LoginBankAccount::new(la.id))
     }
 }

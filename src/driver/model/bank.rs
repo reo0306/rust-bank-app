@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::app::model::bank::{CreateBankAccount, CreateDepositHistory, UpdateMoney};
+use crate::app::model::bank::{CreateBankAccount, CreateDepositHistory, UpdateMoney, LoginBankAccount};
 use crate::domain::model::bank::{BankAccount, DepositHistories, DepositDownloadHistories};
 
 #[derive(Debug, Serialize)]
@@ -44,6 +44,12 @@ pub struct JsonCreateHistory {
 #[derive(Debug, Deserialize)]
 pub struct JsonUpdateMoney {
     pub money: i32,
+}
+
+#[derive(Debug, Serialize)]
+pub struct JsonLogin {
+    pub id: String,
+    pub password: String,
 }
 
 impl From<JsonCreateAccount> for CreateBankAccount {
@@ -101,6 +107,15 @@ impl From<DepositDownloadHistories> for JsonHistoriesDownload {
             bank_account_id: ddh.bank_account_id,
             action: ddh.action,
             money: ddh.money,
+        }
+    }
+}
+
+impl From<JsonLogin> for LoginAccount {
+    fn from(jlv: JsonLogin) -> Self {
+        LoginAccount{
+            id: jlv.id,
+            password: jlv.password,
         }
     }
 }

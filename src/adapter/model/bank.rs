@@ -1,7 +1,7 @@
 use sqlx::FromRow;
 
 use crate::domain::model::bank::{
-    BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, DepositDownloadHistories, RenewMoney,
+    BankAccount, DepositHistories, NewBankAccount, NewDepositHistory, DepositDownloadHistories, RenewMoney, SignupBankAccount,
 };
 
 #[derive(FromRow)]
@@ -46,6 +46,12 @@ pub struct NewDepositHistoryRecord {
 
 pub struct RenewMoneyRecord {
     pub money: i32,
+}
+
+#[derive(FromRow)]
+pub struct SignupBankAccountTable {
+    pub id: String,
+    pub password: String,
 }
 
 impl TryFrom<BankAccountTable> for BankAccount {
@@ -119,5 +125,16 @@ impl TryFrom<RenewMoney> for RenewMoneyRecord {
 
     fn try_from(rm: RenewMoney) -> Result<Self, Self::Error> {
         Ok(RenewMoneyRecord { money: rm.money })
+    }
+}
+
+impl TryFrom<SignupBankAccountTable> for SignupBankAccount {
+    type Error = anyhow::Error;
+
+    fn try_from(sbat: SignupBankAccountTable) -> Result<Self, Self::Error> {
+        Ok(SignupBankAccount {
+            id: sbat.id,
+            password: sbat.password,
+        })
     }
 }
