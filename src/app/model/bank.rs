@@ -5,14 +5,11 @@ use argon2::{
         SaltString,
         PasswordHasher,
     },
-    Algorithm,
-    Version,
-    Params,
     Argon2
 };
 
 use crate::domain::model::{
-    bank::{NewBankAccount, NewDepositHistory, RenewMoney, LoginBankAccount},
+    bank::{NewBankAccount, NewDepositHistory, RenewMoney},
     Id,
 };
 
@@ -96,14 +93,5 @@ impl TryFrom<UpdateMoney> for RenewMoney {
 
     fn try_from(um: UpdateMoney) -> anyhow::Result<Self, Self::Error> {
         Ok(RenewMoney::new(um.money))
-    }
-}
-
-
-impl TryFrom<LoginAccount> for LoginBankAccount {
-    type Error = anyhow::Error;
-
-    fn try_from(la: LoginAccount) -> anyhow::Result<Self, Self::Error> {
-        Ok(LoginBankAccount::new(la.id))
     }
 }

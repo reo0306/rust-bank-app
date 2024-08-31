@@ -17,5 +17,5 @@ pub trait BankManagerRepository {
     async fn create_new_history(&self, params: NewDepositHistory) -> Result<()>;
     async fn find_download_histories(&self, id: &Id<DepositHistories>) -> Result<Option<Vec<DepositDownloadHistories>>>;
     async fn update_money(&self, id: &Id<BankAccount>, params: RenewMoney) -> Result<()>;
-    async fn login_account(&self, id: &Id<BankAccount>) -> Result<Option<SignupBankAccount>>;
+    async fn find_login_account(&self, id: &Id<BankAccount>) -> Result<Option<SignupBankAccount>>;
 }

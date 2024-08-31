@@ -3,8 +3,8 @@ use async_trait::async_trait;
 
 use super::DatabaseRepositoryImpl;
 use crate::adapter::model::bank::{
-    BankAccountTable, DepositHistoriesTable, DepositDownloadHistoriesTable, NewBankAccountRecord, NewDepositHistoryRecord,
-    RenewMoneyRecord,
+    BankAccountTable, DepositHistoriesTable, DepositDownloadHistoriesTable, SignupBankAccountTable,
+    NewBankAccountRecord, NewDepositHistoryRecord, RenewMoneyRecord,
 };
 use crate::domain::{
     model::{
@@ -151,6 +151,7 @@ impl BankManagerRepository for DatabaseRepositoryImpl<BankAccount> {
         .ok();
 
         signup_bank_account_table.map_or(Ok(None), |data| Ok(Some(data.try_into()?)))
+    }
 }
 
 #[cfg(test)]

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::app::model::bank::{CreateBankAccount, CreateDepositHistory, UpdateMoney, LoginBankAccount};
+use crate::app::model::bank::{CreateBankAccount, CreateDepositHistory, UpdateMoney, LoginAccount};
 use crate::domain::model::bank::{BankAccount, DepositHistories, DepositDownloadHistories};
 
 #[derive(Debug, Serialize)]

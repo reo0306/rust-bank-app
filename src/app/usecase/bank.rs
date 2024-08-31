@@ -1,11 +1,15 @@
 use anyhow::Result;
 use derive_new::new;
 use std::sync::Arc;
+use argon2::{
+    Argon2,
+    password_hash::PasswordHash, PasswordVerifier,
+};
 
 use crate::adapter::module::RepositoriesModuleExt;
-use crate::app::model::bank::{CreateBankAccount, CreateDepositHistory, UpdateMoney};
+use crate::app::model::bank::{CreateBankAccount, CreateDepositHistory, UpdateMoney, LoginAccount};
 use crate::domain::{
-    model::bank::{BankAccount, DepositHistories, DepositDownloadHistories},
+    model::bank::{BankAccount, DepositHistories, DepositDownloadHistories, SignupBankAccount},
     repository::bank::BankManagerRepository,
 };
 
@@ -61,12 +65,49 @@ impl<R: RepositoriesModuleExt> BankManagerUseCase<R> {
             .await
     }
 
-    pub async fn login_account(&self, data: LoginBankAccount) -> Result<Option<SignupBankAccount>> {
+    pub async fn signup_account(&self, data: LoginAccount) -> Result<bool> {
+    //pub async fn signup_account(&self, data: LoginAccount) -> Result<Option<SignupBankAccount>> {
         let account = self.repositories
             .bank_manager_repository()
-            .find_login_account(data.id.try_into()?)
-            .await
-            .map(|login_account| login_account.map(|la| la.into()))
+            .find_login_account(&data.id.try_into()?)
+            .await?;
+
+        match account {
+            Some(account) => {
+                let pared_hash = PasswordHash::new(&account.password).unwrap();
+                Argon2::default().verify_password(data.password.as_bytes(), &pared_hash)
+                .map(|_| true)
+                .map_err(|_| anyhow::Error::msg("Password verification failed"))
+            }
+            None => Ok(false),
+        }
+        /*
+            .map_or(Ok(false), |account| {
+            //.map_or(Err(_), |account| {
+                let pared_hash = PasswordHash::new(&account.password).unwrap();
+                //let pared_hash = PasswordHash::new(&account.password).map_err(|_| anyhow::Error::msg("Password parse error"))?;
+                Argon2::default().verify_password(data.password.as_bytes(), &pared_hash)
+                .map(|_| true)
+                //.map(|_| ())
+                //.map_err(|_| anyhow::Error::msg("Password verification failed"))
+                .map_err(|_| Err(false))
+            })
+       */
+            /*
+            .map(|login_account| 
+                login_account.map(|account| {
+                    let pared_hash = PasswordHash::new(&account.password).unwrap();
+                    Argon2::default().verify_password(data.password.as_bytes(), &pared_hash).is_ok()
+                    /*match la {
+                        Ok(account) => {
+                            let pared_hash = PasswordHash::new(&account.password).unwrap();
+                            Ok(Argon2::default().verify_password(data.password.as_bytes(), &pared_hash).is_ok())
+                        }
+                        Err(_) => Err(false)
+                    }*/
+                })
+                .ok_or_else(|| false)
+            );*/
     }
 
 }
