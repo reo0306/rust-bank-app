@@ -22,11 +22,11 @@ pub async fn run(modules: Arc<Modules>) -> Result<()> {
     let bank_router = Router::new()
         .route("/", post(create_account))
         .route("/:id", get(find_account))
-        .route("/login", post(login_account))
         .route("/history", post(create_history))
         .route("/history/:id", get(find_histories))
         .route("/history/:id/download", get(download_histories))
-        .route("/money/:id", patch(update_money));
+        .route("/money/:id", patch(update_money))
+        .route("/login/account", post(login_account));
 
     let bank_dynamodb_router = Router::new()
         .route("/history", post(create_dynamodb_history))

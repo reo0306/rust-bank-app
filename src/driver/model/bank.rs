@@ -46,7 +46,7 @@ pub struct JsonUpdateMoney {
     pub money: i32,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct JsonLogin {
     pub id: String,
     pub password: String,

@@ -11,7 +11,6 @@ use std::{
     sync::Arc
 };
 use tokio_util::io::ReaderStream;
-use serde_json::json;
 
 use crate::driver::{
     model::bank::{
@@ -139,8 +138,7 @@ pub async fn login_account(
     Extension(modules): Extension<Arc<Modules>>,
     Json(params): Json<JsonLogin>,
 ) -> Result<impl IntoResponse, StatusCode> {
-//) -> Result<Json<serde_json::Value>, StatusCode> {
-    /*modules
+    modules
         .bank_manager_use_case()
         .signup_account(params.into())
         .await
@@ -148,33 +146,37 @@ pub async fn login_account(
         .map_err(|_| {
             StatusCode::UNAUTHORIZED
         })
-    */
 
-    let res = modules
+    /*let res = modules
         .bank_manager_use_case()
         .signup_account(params.into())
         .await;
-    /*
-    match res {
-        Ok(account) => {
-            let pared_hash = PasswordHash::new(&account.password).map_err(|_| anyhow::Error::msg("Password parse error"))?;
-            Argon2::default().verify_password(data.password.as_bytes(), &pared_hash)
-            .map(|_| StatusCode::OK)
-            .map_err(|_| StatusCode::UNAUTHORIZED)
-        }
+    */
+
+    /*match res {
+        Ok(true) => {
+            Ok(
+                (StatusCode::OK, Json(json!({ "status": "ok" })))
+            )
+        },
+        Ok(false) => {
+            Ok(
+                (StatusCode::OK, Json(json!({ "status": "err" })))
+            )
+        },
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
+    }*/
+
+
+    /*match res {
+        Ok(Some(account)) => {
+            let json: JsonLogin = account.into();
+
+            Ok(Json(json))
+        },
+        Ok(None) => Err(StatusCode::NOT_FOUND),
         Err(_) => {
             Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
-    }
-    */
-
-    match res {
-        Ok(true) => {
-            Ok(Json(json!({ "status": "ok" })))
-        },
-        Ok(false) => {
-            Ok(Json(json!({ "status": "err" })))
-        },
-        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
-    }
+    }*/
 }
